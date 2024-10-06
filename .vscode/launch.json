@@ -1,0 +1,28 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "SistemaCampusPizzaUI",
+            "request": "launch",
+            "mainClass": "SistemaCampusPizzaUI",
+            "projectName": "Proyecto2_BD1_G2_1cacab92"
+        },
+        {
+            "type": "java",
+            "name": "Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "SistemaCampusPizzaUI",
+            "request": "launch",
+            "mainClass": "SistemaCampusPizzaUI.java",
+            "projectName": "Proyecto2_BD1_G2_1cacab92",
+            "classPaths": [
+                "lib/postgresql-42.7.4.jar"
+            ]
+        }
+    ]
+}

@@ -141,7 +141,7 @@ public class SistemaCampusPizzaUI {
         //Ciclo para validar el username del usuario
         boolean validar_username = true;
         while(validar_username){
-            System.out.println("Ingrese su nombre de usuario (este debe ser único y no puede contener espacios):");
+            System.out.println("\nIngrese su nombre de usuario (este debe ser único y no puede contener espacios):");
             username = scanString.nextLine().trim().toLowerCase();
 
             if(username.contains(" ")) {
@@ -154,7 +154,7 @@ public class SistemaCampusPizzaUI {
                 validar_username = false;}}
 	        
 		//Solicitar contraseña
-		System.out.println("Ingrese su password:");
+		System.out.println("\nIngrese su password:");
 		password = scanString.nextLine().trim();
         
         //Agregar los datos al usuario y agregarlo a la base de datos
