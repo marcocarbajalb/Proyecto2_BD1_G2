@@ -109,9 +109,9 @@ public class SistemaCampusPizzaUI {
         //[Registro de datos para crear el usuario]
 
  		//Solicitar al usuario sus nombres y apellidos
-        System.out.println("\nIngrese sus nombres separados por espacios (ej. 'Nombre1 Nombre2'):");
+        System.out.println("\nIngrese su(s) nombre(s) [ej. 'Nombre1 Nombre2']:");
         nombres = scanString.nextLine().trim();
-        System.out.println("\nIngrese sus apellidos separados por espacios (ej. 'Apellido1 Apellido2'):");
+        System.out.println("\nIngrese su(s) apellido(s) [ej. 'Apellido1 Apellido2']:");
         apellidos = scanString.nextLine().trim();
 
         String [] sedes_restaurante = {"Campus Pizza UVG","Campus Pizza URL","Campus Pizza UFM","Campus Pizza UNIS", "Campus Pizza USAC"};

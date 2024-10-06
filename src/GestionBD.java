@@ -81,7 +81,6 @@ public class GestionBD {
                     statement.setInt(2, ((Mesero)usuario).getRestaurante_id());}
                 else {
                     statement.setInt(2, ((Gerente)usuario).getRestaurante_id());}
-                statement.setInt(2, ((Mesero)usuario).getRestaurante_id());
                 statement.executeUpdate();}  // Inserta el usuario en la tabla personal
             catch (SQLException e) {
                 e.printStackTrace();}

@@ -78,9 +78,64 @@ public class Gerente extends ITipoUsuario {
     public int getRestaurante_id() {
         return restaurante_id;
     }
+
+    public String getSede_restaurante() {
+        String [] sedes_restaurante = {"Campus Pizza UVG","Campus Pizza URL","Campus Pizza UFM","Campus Pizza UNIS", "Campus Pizza USAC"};
+        return sedes_restaurante[this.restaurante_id-1];
+    }
     
     @Override
     public void mostrarMenu(ITipoUsuario usuario_activo, GestionBD gestionBD, Scanner scanString, Scanner scanInt) {
-        // Menú del gerente
+        boolean menu_secundario = true;
+		    while(menu_secundario) {
+		        System.out.println("\n-------------------------------------------------------------------------");
+                System.out.println("\n[GERENTE | " +  ((Gerente) usuario_activo).getSede_restaurante() + "]\nBienvenido/a, "+ usuario_activo.getNombres() + " " + usuario_activo.getApellidos());
+		        System.out.println("\nIngrese el numero correspondiente a la opcion que desea realizar:\n1. Ver disponibilidad de mesas\n2. Consultar reservas\n3. Consultar pedidos\n4. Gestionar inventario\n5. Ver historial de clientes\n6. Ver meseros\n7. Cerrar sesión");
+
+				int decision_secundaria = 0;
+				try {decision_secundaria = scanInt.nextInt();}
+
+				catch(Exception e) {//En caso de que el usuario ingrese texto en lugar de un número 
+					System.out.println("\n**ERROR** La decision ingresada debe ser un numero.");
+					scanInt.nextLine();
+					continue;}
+				
+				switch(decision_secundaria) {
+					case 1:{//Ver disponibilidad de mesas
+						System.out.println("\n---------------VER DISPONIBILIDAD DE MESAS---------------");
+
+						break;}
+
+                    case 2:{//Consultar reservas
+                        System.out.println("\n-----------------CONSULTAR RESERVAS-----------------");
+
+                        break;}
+
+                    case 3:{//Consultar pedidos
+                        System.out.println("\n------------------CONSULTAR PEDIDOS------------------");
+
+                        break;}
+                    
+                    case 4:{//Gestionar inventario
+                        System.out.println("\n-------------------GESTIONAR INVENTARIO-------------------");
+
+                        break;}
+
+                    case 5:{//Ver historial de clientes
+                        System.out.println("\n-------------------VER HISTORIAL DE CLIENTES-------------------");
+
+                        break;}
+
+                    case 6:{//Ver meseros
+                        System.out.println("\n-------------------VER MESEROS-------------------");
+
+                        break;}
+
+                    case 7:{//Cerrar sesión
+                        menu_secundario = false;
+                        break;}
+					
+					default:{//Opción no disponible (programación defensiva)
+						System.out.println("\n**ERROR**\nEl numero ingresado no se encuentra entre las opciones disponibles.");}}}
     }
 }
