@@ -1,0 +1,5 @@
+# Ignorar cualquier archivo dentro de src
+src/*
+
+# Exceptuar (permitir) los archivos .java dentro de src y sus subcarpetas
+!src/**/*.java
