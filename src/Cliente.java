@@ -71,7 +71,7 @@ public class Cliente extends ITipoUsuario {
     }
     
     @Override
-    public void mostrarMenu(ITipoUsuario usuario_activo, GestionBD gestionBD, Scanner scanString, Scanner scanInt) {
+    public void mostrarMenu(ITipoUsuario usuario_activo, GestionBD gestionBD, TimeSimulator simulator, Scanner scanString, Scanner scanInt) {
         boolean menu_secundario = true;
 		    while(menu_secundario) {
 		        System.out.println("\n-------------------------------------------------------------------------");
