@@ -30,7 +30,7 @@ public class TimeSimulator {
         this.timeSpeed = speed;
     }
 
-    public LocalDateTime getCurrentSimulatedTime() {
+    public LocalDateTime getTiempoSimuladoActual() {
         if (isRunning) {
             long now = System.currentTimeMillis();
             long elapsedMillis = now - lastUpdate;
@@ -45,7 +45,7 @@ public class TimeSimulator {
         return simulatedTime;
     }
 
-    public String getCurrentSimulatedTimeFormatted() {
-        return getCurrentSimulatedTime().format(SQL_FORMATTER);
+    public String getFechaFormateada() {
+        return getTiempoSimuladoActual().format(SQL_FORMATTER);
     }
 }

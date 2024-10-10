@@ -90,6 +90,7 @@ public class Mesero extends ITipoUsuario {
 		    while(menu_secundario) {
 		        System.out.println("\n-------------------------------------------------------------------------");
                 System.out.println("\n[MESERO | " +  ((Mesero) usuario_activo).getSede_restaurante() + "]\nBienvenido/a, "+ usuario_activo.getNombres() + " " + usuario_activo.getApellidos());
+                System.out.println("\t\t[Fecha y hora actual: " + simulator.getFechaFormateada() + "]");
 		        System.out.println("\nIngrese el numero correspondiente a la opcion que desea realizar:\n1. Ver disponibilidad de mesas\n2. Consultar reservas\n3. Consultar pedidos\n4. Ver inventario\n5. Cerrar sesión");
 
 				int decision_secundaria = 0;

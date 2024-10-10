@@ -76,6 +76,7 @@ public class Administrador extends ITipoUsuario {
 		    while(menu_secundario) {
 		        System.out.println("\n-------------------------------------------------------------------------");
                 System.out.println("\n[ADMINISTRADOR]\nBienvenido/a, "+ usuario_activo.getNombres() + " " + usuario_activo.getApellidos());
+                System.out.println("\t\t[Fecha y hora actual: " + simulator.getFechaFormateada() + "]");
 		        System.out.println("\nIngrese el numero correspondiente a la opcion que desea realizar:\n1. Desplegar auditoría de cambios\n2. Generar reportes\n3. Ver personal\n4. Gestionar inventario\n5. Ver disponibilidad de mesas\n6. Consultar reservas\n7. Consultar pedidos\n8. Ver historial de clientes\n9. Cerrar sesión");
 
 				int decision_secundaria = 0;

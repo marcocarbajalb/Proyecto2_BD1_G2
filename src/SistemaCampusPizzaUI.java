@@ -30,7 +30,7 @@ public class SistemaCampusPizzaUI {
 
             //Iniciar la simulación del tiempo
             TimeSimulator simulator = new TimeSimulator();
-            simulator.setTimeSpeed(30.0); // El tiempo pasa 30 veces más rápido (cada minuto en la vida real es media hora en el simulador)
+            simulator.setTimeSpeed(60.0); // El tiempo pasa 60 veces más rápido (cada minuto en la vida real es una hora en el simulador)
             simulator.start();
             
             boolean menu_principal = true;
@@ -38,7 +38,7 @@ public class SistemaCampusPizzaUI {
                 
                 //Menú que se le mostrará al usuario
                 System.out.println("\n\n-------------------BIENVENIDO/A AL SISTEMA DE CAMPUS PIZZA-------------------");
-                System.out.println("\t\t[Fecha y hora actual: " + simulator.getCurrentSimulatedTimeFormatted() + "]");
+                System.out.println("\t\t[Fecha y hora actual: " + simulator.getFechaFormateada() + "]");
                 System.out.println("\nIngrese el numero correspondiente a la opcion que desea realizar:\n1. Registrarse.\n2. Iniciar sesión.\n3. Salir del programa.");
                 
                 int decision_principal = 0;
