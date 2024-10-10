@@ -12,18 +12,21 @@ public class SistemaCampusPizzaUI {
    
     public static void main(String[] args) {
 
+        //Crear los scanners que registrarán los datos ingresados por el ususario
+        Scanner scanInt = new Scanner(System.in);
+        Scanner scanString = new Scanner(System.in);
+
+        System.out.println("\nConectando con la base de datos...\n\nIngrese su contraseña de PostgreSQL:");
+        String password_postgresql = scanString.nextLine();
+
         //Conectar con la base de datos
-        ConexionBD conexionBD = new ConexionBD();
+        ConexionBD conexionBD = new ConexionBD(password_postgresql);
         Connection conexion = conexionBD.conectar();
 
         if (conexion != null) {
 
             //Instanciar el objeto que gestionará la base de datos
             GestionBD gestionBD = new GestionBD(conexion);
-
-            //Crear los scanners que registrarán los datos ingresados por el ususario
-            Scanner scanInt = new Scanner(System.in);
-            Scanner scanString = new Scanner(System.in);
             
             boolean menu_principal = true;
             while(menu_principal) {
