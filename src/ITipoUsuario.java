@@ -26,5 +26,5 @@ public abstract class ITipoUsuario {
 
     public abstract String getRol();
 
-    public abstract void mostrarMenu(ITipoUsuario usuario_activo, GestionBD gestionBD, Scanner scanString, Scanner scanInt); // Menú que cada rol implementará
+    public abstract void mostrarMenu(ITipoUsuario usuario_activo, GestionBD gestionBD, TimeSimulator simulator, Scanner scanString, Scanner scanInt); // Menú que cada rol implementará
 }

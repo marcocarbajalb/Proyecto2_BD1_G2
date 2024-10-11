@@ -12,8 +12,15 @@ public class SistemaCampusPizzaUI {
    
     public static void main(String[] args) {
 
+        //Crear los scanners que registrarán los datos ingresados por el ususario
+        Scanner scanInt = new Scanner(System.in);
+        Scanner scanString = new Scanner(System.in);
+
+        System.out.println("\nConectando con la base de datos...\n\nIngrese su contraseña de PostgreSQL:");
+        String password_postgresql = scanString.nextLine();
+
         //Conectar con la base de datos
-        ConexionBD conexionBD = new ConexionBD();
+        ConexionBD conexionBD = new ConexionBD(password_postgresql);
         Connection conexion = conexionBD.conectar();
 
         if (conexion != null) {
@@ -21,15 +28,17 @@ public class SistemaCampusPizzaUI {
             //Instanciar el objeto que gestionará la base de datos
             GestionBD gestionBD = new GestionBD(conexion);
 
-            //Crear los scanners que registrarán los datos ingresados por el ususario
-            Scanner scanInt = new Scanner(System.in);
-            Scanner scanString = new Scanner(System.in);
+            //Iniciar la simulación del tiempo
+            TimeSimulator simulator = new TimeSimulator();
+            simulator.setTimeSpeed(60.0); // El tiempo pasa 60 veces más rápido (cada minuto en la vida real es una hora en el simulador)
+            simulator.start();
             
             boolean menu_principal = true;
             while(menu_principal) {
                 
                 //Menú que se le mostrará al usuario
                 System.out.println("\n\n-------------------BIENVENIDO/A AL SISTEMA DE CAMPUS PIZZA-------------------");
+                System.out.println("\t\t[Fecha y hora actual: " + simulator.getFechaFormateada() + "]");
                 System.out.println("\nIngrese el numero correspondiente a la opcion que desea realizar:\n1. Registrarse.\n2. Iniciar sesión.\n3. Salir del programa.");
                 
                 int decision_principal = 0;
@@ -48,7 +57,7 @@ public class SistemaCampusPizzaUI {
                     
                     case 2:{//Iniciar sesión
                         System.out.println("\n---------------------------INICIAR SESION---------------------------");
-                        iniciarSesion(gestionBD, scanString, scanInt);
+                        iniciarSesion(gestionBD, simulator, scanString, scanInt);
                         break;}
                     
                     case 3:{//Salir del programa
@@ -56,11 +65,14 @@ public class SistemaCampusPizzaUI {
                         menu_principal = false;
                         
                         //Mostrar al ususario que ha abandonado el programa
-                        System.out.println("\nHa abandonado el programa exitosamente.");
+                        System.out.println("\nHa abandonado el programa exitosamente.\n");
                         
                         //Cerrar todos los scanners
                         scanString.close();
                         scanInt.close();
+
+                        //Detener el simulador
+                        simulator.stop();
                         
                         break;}
                     
@@ -179,7 +191,7 @@ public class SistemaCampusPizzaUI {
         }
 
 
-	public static void iniciarSesion(GestionBD gestionBD, Scanner scanString, Scanner scanInt) {
+	public static void iniciarSesion(GestionBD gestionBD, TimeSimulator simulator, Scanner scanString, Scanner scanInt) {
 	    	
         //En esta variable se registrará el nombre de usuario ingresado por el ususario
 	    String username_ingresado = "";
@@ -197,7 +209,7 @@ public class SistemaCampusPizzaUI {
 		    
             ITipoUsuario usuario_activo = gestionBD.obtenerUsuario(username_ingresado);
 
-			usuario_activo.mostrarMenu(usuario_activo,gestionBD,scanString,scanInt);}
+			usuario_activo.mostrarMenu(usuario_activo,gestionBD,simulator,scanString,scanInt);}
 			    
 	    else {//Si la contraseña ingresada es incorrecta
 			System.out.println("\nCONTRASEÑA INCORRECTA.\nLa contraseña ingresada no es correcta.");}}

@@ -71,11 +71,12 @@ public class Cliente extends ITipoUsuario {
     }
     
     @Override
-    public void mostrarMenu(ITipoUsuario usuario_activo, GestionBD gestionBD, Scanner scanString, Scanner scanInt) {
+    public void mostrarMenu(ITipoUsuario usuario_activo, GestionBD gestionBD, TimeSimulator simulator, Scanner scanString, Scanner scanInt) {
         boolean menu_secundario = true;
 		    while(menu_secundario) {
 		        System.out.println("\n-------------------------------------------------------------------------");
                 System.out.println("\n[CLIENTE]\nBienvenido/a, "+ usuario_activo.getNombres() + " " + usuario_activo.getApellidos());
+                System.out.println("\t\t[Fecha y hora actual: " + simulator.getFechaFormateada() + "]");
 		        System.out.println("\nIngrese el numero correspondiente a la opcion que desea realizar:\n1. Reservar en restaurante\n2. Consultar mis reservas\n3. Consultar mi historial de visitas\n4. Cerrar sesión");
 
 				int decision_secundaria = 0;

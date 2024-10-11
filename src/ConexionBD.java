@@ -13,8 +13,12 @@ public class ConexionBD {
     
     private final String url = "jdbc:postgresql://localhost:5432/Proyecto2"; // URL de la base de datos
     private final String usuario = "postgres"; // Usuario de la base de datos
-    private final String password = "admin123"; // Contraseña de la base de datos
+    private String password; // Contraseña de la base de datos
     private Connection conexion = null;
+
+    public ConexionBD(String password) {
+        this.password = password;
+    }
 
     public Connection conectar() {
         
@@ -29,11 +33,13 @@ public class ConexionBD {
             System.out.println("\n[Conexión exitosa a la base de datos]");
 
         } catch (ClassNotFoundException e) {
-            System.out.println("\n[Error: No se encontró el controlador de PostgreSQL]");
+            System.out.println("\n[ERROR: No se encontró el controlador de PostgreSQL]");
             e.printStackTrace();
+            System.out.println("\n*BASIC TROUBLESHOOTING*\nVerifique que su contraseña sea correcta, así como que todas las dependencias necesarias estén instaladas y la base de datos esté en ejecución.\n");
         } catch (SQLException e) {
-            System.out.println("\n[Error al conectar con la base de datos] \n" + e.getMessage());
+            System.out.println("\n[ERROR: No se pudo conectar con la base de datos]");
             e.printStackTrace();
+            System.out.println("\n*BASIC TROUBLESHOOTING*\nVerifique que su contraseña sea correcta, así como que todas las dependencias necesarias estén instaladas y la base de datos esté en ejecución.\n");
         }
         return conexion;
     }
