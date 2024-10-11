@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.sql.Date;
 import java.sql.Time;
+import java.sql.Array;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -218,11 +219,12 @@ public class GestionBD {
         return mesasDisponibles; // Retorna la lista de mesas disponibles
     }
 
-    public boolean realizarReserva(int usuario_id, int restaurante_id, int num_personas, int cantidad_mesas, String fecha, String hora) {
+    public int realizarReserva(int usuario_id, int restaurante_id, int num_personas, int cantidad_mesas, String fecha, String hora) {
         String sqlReserva = "INSERT INTO reserva (fecha, hora, num_personas, restaurante_id) VALUES (?, ?, ?, ?) RETURNING reserva_id";
         String sqlReservaMesa = "INSERT INTO reserva_mesa (reserva_id, mesa_id) VALUES (?, ?)";
         String sqlUsuarioReserva = "INSERT INTO usuario_reserva (usuario_id, reserva_id) VALUES (?, ?)";
-        
+        int reserva_id = 0;
+
         try (PreparedStatement pstmtReserva = conexion.prepareStatement(sqlReserva);
              PreparedStatement pstmtReservaMesa = conexion.prepareStatement(sqlReservaMesa);
              PreparedStatement pstmtUsuarioReserva = conexion.prepareStatement(sqlUsuarioReserva)) {
@@ -241,7 +243,7 @@ public class GestionBD {
             // Obtener el ID de la reserva recién creada
             ResultSet rs = pstmtReserva.executeQuery();
             if (rs.next()) {
-                int reserva_id = rs.getInt(1);
+                reserva_id = rs.getInt(1);
         
                 // 2. Insertar en la tabla reserva_mesa para cada mesa seleccionada
                 List<Integer> mesasSeleccionadas = obtenerMesasDisponibles(restaurante_id, fecha, hora);
@@ -261,12 +263,12 @@ public class GestionBD {
                 pstmtUsuarioReserva.setInt(2, reserva_id);
                 pstmtUsuarioReserva.executeUpdate();
         
-                return true; // Reserva realizada con éxito
+                return reserva_id;
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
-        return false; // Error al realizar la reserva
+        return reserva_id; // Si falló, regresará un 0
     }
     
     public void actualizarEstadoMesas(String fecha, String hora) {
@@ -299,6 +301,44 @@ public class GestionBD {
     
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+        }
+    }    
+    
+    public void detalles_reserva(int reserva_id, int restaurante_id) {
+        String sql = "SELECT r.reserva_id, r.fecha, r.hora, r.num_personas, ARRAY_AGG(m.num_mesa) AS mesas " +
+                     "FROM reserva r " +
+                     "JOIN reserva_mesa rm ON r.reserva_id = rm.reserva_id " +
+                     "JOIN mesas m ON rm.mesa_id = m.mesa_id " +  // Unir con la tabla mesas
+                     "WHERE r.reserva_id = ? " +
+                     "GROUP BY r.reserva_id, r.fecha, r.hora, r.num_personas";
+        String[] restaurantes = {"Campus Pizza UVG", "Campus Pizza URL", "Campus Pizza UFM", "Campus Pizza UNIS", "Campus Pizza USAC"};
+    
+        try (PreparedStatement statement = conexion.prepareStatement(sql)) {
+            statement.setInt(1, reserva_id);
+    
+            ResultSet rs = statement.executeQuery();
+    
+            if (rs.next()) {
+                // Obtener los detalles de la reserva
+                int id = rs.getInt("reserva_id");
+                Date fecha = rs.getDate("fecha");
+                Time hora = rs.getTime("hora");
+                int num_personas = rs.getInt("num_personas");
+    
+                Array mesasArray = rs.getArray("mesas");
+                Integer[] mesas = (Integer[]) (Object[]) mesasArray.getArray();
+    
+                // Mostrar detalles de la reserva
+                System.out.println("\tReserva #" + id + " | Sede: " + restaurantes[restaurante_id - 1]);
+                System.out.println("\tFecha y hora: " + fecha + " " + hora);
+                System.out.println("\tNúmero de personas: " + num_personas + " (total de mesas: " + mesas.length + ")");
+                System.out.println("\tSu(s) número(s) de mesa: " + Arrays.toString(mesas).substring(1, Arrays.toString(mesas).length() - 1));
+            } else {
+                System.out.println("No se encontró una reserva con el ID proporcionado.");
+            }
+    
+        } catch (SQLException e) {
+            System.out.println("Error al obtener los detalles de la reserva: " + e.getMessage());
         }
     }    
     

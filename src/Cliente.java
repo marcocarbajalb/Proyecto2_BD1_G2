@@ -74,9 +74,10 @@ public class Cliente extends ITipoUsuario {
     public void mostrarMenu(ITipoUsuario usuario_activo, GestionBD gestionBD, TimeSimulator simulator, Scanner scanString, Scanner scanInt) {
         boolean menu_secundario = true;
 		    while(menu_secundario) {
-		        System.out.println("\n-------------------------------------------------------------------------");
+		        System.out.println("\n░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░");
+                System.out.println("\n\t\t╔══════════════════════════════════════════╗\n\t\t║ Fecha y hora actual: " + simulator.getFechaFormateada() + " ║\n\t\t╚══════════════════════════════════════════╝");
+                
                 System.out.println("\n[CLIENTE]\nBienvenido/a, "+ usuario_activo.getNombres() + " " + usuario_activo.getApellidos());
-                System.out.println("\t\t[Fecha y hora actual: " + simulator.getFechaFormateada() + "]");
 		        System.out.println("\nIngrese el numero correspondiente a la opcion que desea realizar:\n1. Reservar en restaurante\n2. Consultar mis reservas\n3. Consultar mi historial de visitas\n4. Cerrar sesión");
 
 				int decision_secundaria = 0;
@@ -89,17 +90,17 @@ public class Cliente extends ITipoUsuario {
 				
 				switch(decision_secundaria) {
 					case 1:{//Reservar en restaurante
-						System.out.println("\n----------------RESERVAR EN RESTAURANTE----------------");
+						System.out.println("\n╠════════════════════════RESERVAR EN RESTAURANTE════════════════════════╣");
                         hacer_reserva(usuario_activo, gestionBD, simulator, scanString, scanInt);
 						break;}
 					
 					case 2:{//Consultar mis reservas
-						System.out.println("\n----------------CONSULTAR MIS RESERVAS----------------");
+						System.out.println("\n╠═════════════════════════CONSULTAR MIS RESERVAS════════════════════════╣");
 											
 						break;}
 					
 					case 3:{//Consultar mi historial de visitas
-						System.out.println("\n------------CONSULTAR MI HISTORIAL DE VISITAS------------");
+						System.out.println("\n╠════════════════════CONSULTAR MI HISTORIAL DE VISITAS══════════════════╣");
 
 						break;}
 					
@@ -221,8 +222,9 @@ public class Cliente extends ITipoUsuario {
             System.out.println("\n**ERROR** No hay/habrá suficientes mesas disponibles en el restaurante para hacer la reserva en la fecha y hora especificadas.");
             return;}
         else {
-            boolean reserva_realizada = gestionBD.realizarReserva(cliente_id, restaurante_id, num_personas, cantidad_mesas, fecha_reserva, hora_reserva);
-            if(reserva_realizada) {
-                System.out.println("\n¡Reserva realizada con éxito!");}}
+            int reserva_id = gestionBD.realizarReserva(cliente_id, restaurante_id, num_personas, cantidad_mesas, fecha_reserva, hora_reserva);
+            if(reserva_id>0) {
+                System.out.println("\nRESERVA REALIZADA CON ÉXITO.\nA continuación se presentan los detalles de su reserva:\n");
+                gestionBD.detalles_reserva(reserva_id, restaurante_id);}}
         }
 }

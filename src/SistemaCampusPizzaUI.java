@@ -36,8 +36,8 @@ public class SistemaCampusPizzaUI {
             while(menu_principal) {
                 
                 //Menú que se le mostrará al usuario
-                System.out.println("\n\n-------------------BIENVENIDO/A AL SISTEMA DE CAMPUS PIZZA-------------------");
-                System.out.println("\t\t[Fecha y hora actual: " + simulator.getFechaFormateada() + "]");
+                System.out.println("\n\n░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░\n░░░░░░░░░░░░░░░░ BIENVENIDO/A AL SISTEMA DE CAMPUS PIZZA ░░░░░░░░░░░░░░░░\n░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░");
+                System.out.println("\n\t\t╔══════════════════════════════════════════╗\n\t\t║ Fecha y hora actual: " + simulator.getFechaFormateada() + " ║\n\t\t╚══════════════════════════════════════════╝");
                 System.out.println("\nIngrese el numero correspondiente a la opcion que desea realizar:\n1. Registrarse.\n2. Iniciar sesión.\n3. Salir del programa.");
                 
                 int decision_principal = 0;
@@ -50,12 +50,12 @@ public class SistemaCampusPizzaUI {
                     
                 switch(decision_principal) {
                     case 1:{//Registrarse
-                        System.out.println("\n----------------------------REGISTRARSE----------------------------");
+                        System.out.println("\n╠══════════════════════════════REGISTRARSE══════════════════════════════╣");
                         registrarUsuario(gestionBD, scanString, scanInt);
                         break;}
                     
                     case 2:{//Iniciar sesión
-                        System.out.println("\n---------------------------INICIAR SESION---------------------------");
+                        System.out.println("\n╠═════════════════════════════INICIAR SESION════════════════════════════╣");
                         iniciarSesion(gestionBD, simulator, scanString, scanInt);
                         break;}
                     
@@ -188,7 +188,6 @@ public class SistemaCampusPizzaUI {
         else {
             System.out.println(nombres + " " + apellidos + " (" + tipos_de_perfiles[tipo_perfil-1] + "), su nombre de usuario es: " + username + ", y su password es: " + password + ".\nUsted trabaja en: " + sedes_restaurante[restaurante_id-1] + ".");}
         }
-
 
 	public static void iniciarSesion(GestionBD gestionBD, TimeSimulator simulator, Scanner scanString, Scanner scanInt) {
 	    	

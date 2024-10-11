@@ -88,9 +88,10 @@ public class Gerente extends ITipoUsuario {
     public void mostrarMenu(ITipoUsuario usuario_activo, GestionBD gestionBD, TimeSimulator simulator, Scanner scanString, Scanner scanInt) {
         boolean menu_secundario = true;
 		    while(menu_secundario) {
-		        System.out.println("\n-------------------------------------------------------------------------");
+		        System.out.println("\n░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░");
+                System.out.println("\n\t\t╔══════════════════════════════════════════╗\n\t\t║ Fecha y hora actual: " + simulator.getFechaFormateada() + " ║\n\t\t╚══════════════════════════════════════════╝");
+                                
                 System.out.println("\n[GERENTE | " +  ((Gerente) usuario_activo).getSede_restaurante() + "]\nBienvenido/a, "+ usuario_activo.getNombres() + " " + usuario_activo.getApellidos());
-                System.out.println("\t\t[Fecha y hora actual: " + simulator.getFechaFormateada() + "]");
 		        System.out.println("\nIngrese el numero correspondiente a la opcion que desea realizar:\n1. Hacer reserva\n2. Ver disponibilidad de mesas\n3. Consultar reservas\n4. Consultar pedidos\n5. Gestionar inventario\n6. Ver historial de clientes\n7. Ver meseros\n8. Cerrar sesión");
 
 				int decision_secundaria = 0;
@@ -103,37 +104,37 @@ public class Gerente extends ITipoUsuario {
 				
 				switch(decision_secundaria) {
 					case 1:{//Hacer reserva
-                        System.out.println("\n-----------------HACER RESERVA-----------------");
+                        System.out.println("\n╠═════════════════════════════HACER RESERVA═════════════════════════════╣");
 
                         break;}
                     
                     case 2:{//Ver disponibilidad de mesas
-						System.out.println("\n---------------VER DISPONIBILIDAD DE MESAS---------------");
+						System.out.println("\n╠══════════════════════VER DISPONIBILIDAD DE MESAS══════════════════════╣");
 
 						break;}
 
                     case 3:{//Consultar reservas
-                        System.out.println("\n-----------------CONSULTAR RESERVAS-----------------");
+                        System.out.println("\n╠═══════════════════════════CONSULTAR RESERVAS══════════════════════════╣");
 
                         break;}
 
                     case 4:{//Consultar pedidos
-                        System.out.println("\n------------------CONSULTAR PEDIDOS------------------");
+                        System.out.println("\n╠═══════════════════════════CONSULTAR PEDIDOS═══════════════════════════╣");
 
                         break;}
                     
                     case 5:{//Gestionar inventario
-                        System.out.println("\n-------------------GESTIONAR INVENTARIO-------------------");
+                        System.out.println("\n╠══════════════════════════GESTIONAR INVENTARIO═════════════════════════╣");
 
                         break;}
 
                     case 6:{//Ver historial de clientes
-                        System.out.println("\n-------------------VER HISTORIAL DE CLIENTES-------------------");
+                        System.out.println("\n╠═══════════════════════VER HISTORIAL DE CLIENTES═══════════════════════╣");
 
                         break;}
 
                     case 7:{//Ver meseros
-                        System.out.println("\n-------------------VER MESEROS-------------------");
+                        System.out.println("\n╠══════════════════════════════VER MESEROS══════════════════════════════╣");
 
                         break;}
 

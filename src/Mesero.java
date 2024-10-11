@@ -88,9 +88,10 @@ public class Mesero extends ITipoUsuario {
     public void mostrarMenu(ITipoUsuario usuario_activo, GestionBD gestionBD, TimeSimulator simulator, Scanner scanString, Scanner scanInt) {
         boolean menu_secundario = true;
 		    while(menu_secundario) {
-		        System.out.println("\n-------------------------------------------------------------------------");
+		        System.out.println("\n░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░");
+                System.out.println("\n\t\t╔══════════════════════════════════════════╗\n\t\t║ Fecha y hora actual: " + simulator.getFechaFormateada() + " ║\n\t\t╚══════════════════════════════════════════╝");
+                
                 System.out.println("\n[MESERO | " +  ((Mesero) usuario_activo).getSede_restaurante() + "]\nBienvenido/a, "+ usuario_activo.getNombres() + " " + usuario_activo.getApellidos());
-                System.out.println("\t\t[Fecha y hora actual: " + simulator.getFechaFormateada() + "]");
 		        System.out.println("\nIngrese el numero correspondiente a la opcion que desea realizar:\n1. Hacer reserva\n2. Ver disponibilidad de mesas\n3. Consultar reservas\n4. Consultar pedidos\n5. Ver inventario\n6. Cerrar sesión");
 
 				int decision_secundaria = 0;
@@ -103,27 +104,27 @@ public class Mesero extends ITipoUsuario {
 				
 				switch(decision_secundaria) {
 					case 1:{//Hacer reserva
-                        System.out.println("\n-------------------HACER RESERVA-------------------");
+                        System.out.println("\n╠═════════════════════════════HACER RESERVA═════════════════════════════╣");
 
                         break;}
                     
                     case 2:{//Ver disponibilidad de mesas
-						System.out.println("\n---------------VER DISPONIBILIDAD DE MESAS---------------");
+						System.out.println("\n╠══════════════════════VER DISPONIBILIDAD DE MESAS══════════════════════╣");
 
 						break;}
 
                     case 3:{//Consultar reservas
-                        System.out.println("\n-----------------CONSULTAR RESERVAS-----------------");
+                        System.out.println("\n╠═══════════════════════════CONSULTAR RESERVAS══════════════════════════╣");
 
                         break;}
 
                     case 4:{//Consultar pedidos
-                        System.out.println("\n------------------CONSULTAR PEDIDOS------------------");
+                        System.out.println("\n╠═══════════════════════════CONSULTAR PEDIDOS═══════════════════════════╣");
 
                         break;}
                     
                     case 5:{//Ver inventario
-                        System.out.println("\n-------------------VER INVENTARIO-------------------");
+                        System.out.println("\n╠═════════════════════════════VER INVENTARIO════════════════════════════╣");
 
                         break;}
 
