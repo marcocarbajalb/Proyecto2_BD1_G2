@@ -29,8 +29,7 @@ public class SistemaCampusPizzaUI {
             GestionBD gestionBD = new GestionBD(conexion);
 
             //Iniciar la simulación del tiempo
-            TimeSimulator simulator = new TimeSimulator();
-            simulator.setTimeSpeed(60.0); // El tiempo pasa 60 veces más rápido (cada minuto en la vida real es una hora en el simulador)
+            TimeSimulator simulator = new TimeSimulator(conexion);
             simulator.start();
             
             boolean menu_principal = true;

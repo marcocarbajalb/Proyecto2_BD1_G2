@@ -91,7 +91,7 @@ public class Gerente extends ITipoUsuario {
 		        System.out.println("\n-------------------------------------------------------------------------");
                 System.out.println("\n[GERENTE | " +  ((Gerente) usuario_activo).getSede_restaurante() + "]\nBienvenido/a, "+ usuario_activo.getNombres() + " " + usuario_activo.getApellidos());
                 System.out.println("\t\t[Fecha y hora actual: " + simulator.getFechaFormateada() + "]");
-		        System.out.println("\nIngrese el numero correspondiente a la opcion que desea realizar:\n1. Ver disponibilidad de mesas\n2. Consultar reservas\n3. Consultar pedidos\n4. Gestionar inventario\n5. Ver historial de clientes\n6. Ver meseros\n7. Cerrar sesión");
+		        System.out.println("\nIngrese el numero correspondiente a la opcion que desea realizar:\n1. Hacer reserva\n2. Ver disponibilidad de mesas\n3. Consultar reservas\n4. Consultar pedidos\n5. Gestionar inventario\n6. Ver historial de clientes\n7. Ver meseros\n8. Cerrar sesión");
 
 				int decision_secundaria = 0;
 				try {decision_secundaria = scanInt.nextInt();}
@@ -102,37 +102,42 @@ public class Gerente extends ITipoUsuario {
 					continue;}
 				
 				switch(decision_secundaria) {
-					case 1:{//Ver disponibilidad de mesas
+					case 1:{//Hacer reserva
+                        System.out.println("\n-----------------HACER RESERVA-----------------");
+
+                        break;}
+                    
+                    case 2:{//Ver disponibilidad de mesas
 						System.out.println("\n---------------VER DISPONIBILIDAD DE MESAS---------------");
 
 						break;}
 
-                    case 2:{//Consultar reservas
+                    case 3:{//Consultar reservas
                         System.out.println("\n-----------------CONSULTAR RESERVAS-----------------");
 
                         break;}
 
-                    case 3:{//Consultar pedidos
+                    case 4:{//Consultar pedidos
                         System.out.println("\n------------------CONSULTAR PEDIDOS------------------");
 
                         break;}
                     
-                    case 4:{//Gestionar inventario
+                    case 5:{//Gestionar inventario
                         System.out.println("\n-------------------GESTIONAR INVENTARIO-------------------");
 
                         break;}
 
-                    case 5:{//Ver historial de clientes
+                    case 6:{//Ver historial de clientes
                         System.out.println("\n-------------------VER HISTORIAL DE CLIENTES-------------------");
 
                         break;}
 
-                    case 6:{//Ver meseros
+                    case 7:{//Ver meseros
                         System.out.println("\n-------------------VER MESEROS-------------------");
 
                         break;}
 
-                    case 7:{//Cerrar sesión
+                    case 8:{//Cerrar sesión
                         menu_secundario = false;
                         break;}
 					

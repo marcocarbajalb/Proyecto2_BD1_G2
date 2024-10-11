@@ -9,8 +9,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.sql.Date;
+import java.sql.Time;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 public class GestionBD {
     private Connection conexion;
@@ -134,4 +139,167 @@ public class GestionBD {
         return null;
     }
 
+    public boolean verificarMesasDisponibles(int restaurante_id, int cantidad_mesas, String fecha, String hora) {
+        String sql = "SELECT COUNT(m.mesa_id) " +
+                    "FROM mesas m " +
+                    "WHERE m.restaurante_id = ? " +
+                    "AND m.estado = 'disponible' " +
+                    "AND m.mesa_id NOT IN ( " +
+                    "    SELECT rm.mesa_id " +
+                    "    FROM reserva r " +
+                    "    JOIN reserva_mesa rm ON r.reserva_id = rm.reserva_id " +
+                    "    WHERE r.restaurante_id = ? " +
+                    "    AND r.fecha = ?::DATE " +
+                    "    AND r.hora = ?::TIME " +
+                    ")";
+        
+        try (PreparedStatement statement = conexion.prepareStatement(sql)) {
+            
+            LocalDate localDate = LocalDate.parse(fecha);
+            Date sqlDate = Date.valueOf(localDate);
+            LocalTime localTime = LocalTime.parse(hora);
+            Time sqlTime = Time.valueOf(localTime);
+    
+            statement.setInt(1, restaurante_id);
+            statement.setInt(2, restaurante_id);
+            statement.setDate(3, sqlDate);
+            statement.setTime(4, sqlTime);
+        
+            ResultSet rs = statement.executeQuery();
+        
+            if (rs.next()) {
+                int mesasDisponibles = rs.getInt(1);
+                // Verifica si hay suficientes mesas disponibles
+                if (mesasDisponibles >= cantidad_mesas) {
+                    return true;
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return false;
+    }    
+
+    public List<Integer> obtenerMesasDisponibles(int restaurante_id, String fecha, String hora) {
+        List<Integer> mesasDisponibles = new ArrayList<>();
+        String sql = "SELECT m.mesa_id " +
+                     "FROM mesas m " +
+                     "WHERE m.restaurante_id = ? " +
+                     "AND m.estado = 'disponible' " +
+                     "AND m.mesa_id NOT IN ( " +
+                     "    SELECT rm.mesa_id " +
+                     "    FROM reserva r " +
+                     "    JOIN reserva_mesa rm ON r.reserva_id = rm.reserva_id " +
+                     "    WHERE r.restaurante_id = ? " +
+                     "    AND r.fecha = ?::DATE " +
+                     "    AND r.hora = ?::TIME " +
+                     ") ORDER BY m.mesa_id ASC";
+        
+        try (PreparedStatement statement = conexion.prepareStatement(sql)) {
+            // Convertir fecha y hora
+            LocalDate localDate = LocalDate.parse(fecha);
+            Date sqlDate = Date.valueOf(localDate);
+            LocalTime localTime = LocalTime.parse(hora);
+            Time sqlTime = Time.valueOf(localTime);
+    
+            statement.setInt(1, restaurante_id);
+            statement.setInt(2, restaurante_id);
+            statement.setDate(3, sqlDate);
+            statement.setTime(4, sqlTime);
+        
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                mesasDisponibles.add(rs.getInt("mesa_id"));
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        
+        return mesasDisponibles; // Retorna la lista de mesas disponibles
+    }
+
+    public boolean realizarReserva(int usuario_id, int restaurante_id, int num_personas, int cantidad_mesas, String fecha, String hora) {
+        String sqlReserva = "INSERT INTO reserva (fecha, hora, num_personas, restaurante_id) VALUES (?, ?, ?, ?) RETURNING reserva_id";
+        String sqlReservaMesa = "INSERT INTO reserva_mesa (reserva_id, mesa_id) VALUES (?, ?)";
+        String sqlUsuarioReserva = "INSERT INTO usuario_reserva (usuario_id, reserva_id) VALUES (?, ?)";
+        
+        try (PreparedStatement pstmtReserva = conexion.prepareStatement(sqlReserva);
+             PreparedStatement pstmtReservaMesa = conexion.prepareStatement(sqlReservaMesa);
+             PreparedStatement pstmtUsuarioReserva = conexion.prepareStatement(sqlUsuarioReserva)) {
+        
+            LocalDate localDate = LocalDate.parse(fecha);
+            java.sql.Date sqlDate = java.sql.Date.valueOf(localDate);
+            LocalTime localTime = LocalTime.parse(hora);
+            java.sql.Time sqlTime = java.sql.Time.valueOf(localTime);
+    
+            // 1. Insertar en la tabla reserva
+            pstmtReserva.setDate(1, sqlDate);
+            pstmtReserva.setTime(2, sqlTime);
+            pstmtReserva.setInt(3, num_personas);
+            pstmtReserva.setInt(4, restaurante_id);
+        
+            // Obtener el ID de la reserva recién creada
+            ResultSet rs = pstmtReserva.executeQuery();
+            if (rs.next()) {
+                int reserva_id = rs.getInt(1);
+        
+                // 2. Insertar en la tabla reserva_mesa para cada mesa seleccionada
+                List<Integer> mesasSeleccionadas = obtenerMesasDisponibles(restaurante_id, fecha, hora);
+                int mesas_insertadas = 0;
+                for (int mesa_id : mesasSeleccionadas) {
+                    if (mesas_insertadas == cantidad_mesas) {
+                        break;
+                    }
+                    pstmtReservaMesa.setInt(1, reserva_id);
+                    pstmtReservaMesa.setInt(2, mesa_id);
+                    pstmtReservaMesa.executeUpdate();
+                    mesas_insertadas++;
+                }
+        
+                // 3. Insertar en la tabla usuario_reserva
+                pstmtUsuarioReserva.setInt(1, usuario_id);
+                pstmtUsuarioReserva.setInt(2, reserva_id);
+                pstmtUsuarioReserva.executeUpdate();
+        
+                return true; // Reserva realizada con éxito
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return false; // Error al realizar la reserva
+    }
+    
+    public void actualizarEstadoMesas(String fecha, String hora) {
+        String sql = "UPDATE mesas m " +
+                     "SET estado = CASE " +
+                     "    WHEN m.mesa_id IN ( " +
+                     "        SELECT rm.mesa_id " +
+                     "        FROM reserva r " +
+                     "        JOIN reserva_mesa rm ON r.reserva_id = rm.reserva_id " +
+                     "        WHERE r.fecha = ?::DATE " +
+                     "        AND r.hora = ?::TIME " +
+                     "        AND r.restaurante_id = m.restaurante_id " +
+                     "    ) THEN 'ocupada' " +
+                     "    ELSE 'disponible' " +
+                     "END";
+    
+        try (PreparedStatement statement = conexion.prepareStatement(sql)) {
+            
+            LocalDate localDate = LocalDate.parse(fecha);
+            java.sql.Date sqlDate = java.sql.Date.valueOf(localDate);
+            LocalTime localTime = LocalTime.parse(hora);
+            java.sql.Time sqlTime = java.sql.Time.valueOf(localTime);
+    
+            // Asignar parámetros
+            statement.setDate(1, sqlDate);
+            statement.setTime(2, sqlTime);
+    
+            // Ejecutar la actualización
+            statement.executeUpdate();
+    
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }    
+    
 }
