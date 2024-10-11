@@ -4,7 +4,12 @@
  * Clase para los usuarios de tipo cliente
  */
  
- import java.util.Scanner;
+import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Arrays;
 
 public class Cliente extends ITipoUsuario {
     
@@ -78,7 +83,7 @@ public class Cliente extends ITipoUsuario {
                 System.out.println("\n\t\t╔══════════════════════════════════════════╗\n\t\t║ Fecha y hora actual: " + simulator.getFechaFormateada() + " ║\n\t\t╚══════════════════════════════════════════╝");
                 
                 System.out.println("\n[CLIENTE]\nBienvenido/a, "+ usuario_activo.getNombres() + " " + usuario_activo.getApellidos());
-		        System.out.println("\nIngrese el numero correspondiente a la opcion que desea realizar:\n1. Reservar en restaurante\n2. Consultar mis reservas\n3. Consultar mi historial de visitas\n4. Cerrar sesión");
+		        System.out.println("\nIngrese el numero correspondiente a la opcion que desea realizar:\n1. Reservar en restaurante\n2. Consultar mis reservas\n3. Dejar observaciones/comentarios \n4. Consultar mi historial de visitas\n5. Cerrar sesión");
 
 				int decision_secundaria = 0;
 				try {decision_secundaria = scanInt.nextInt();}
@@ -99,12 +104,17 @@ public class Cliente extends ITipoUsuario {
 											
 						break;}
 					
-					case 3:{//Consultar mi historial de visitas
+                    case 3:{//Dejar observaciones/comentarios
+                        System.out.println("\n╠═════════════════════DEJAR OBERVACIONES/COMENTARIOS════════════════════╣");
+
+                        break;}
+					
+                    case 4:{//Consultar mi historial de visitas
 						System.out.println("\n╠════════════════════CONSULTAR MI HISTORIAL DE VISITAS══════════════════╣");
 
 						break;}
 					
-					case 4:{//Cerrar sesión
+					case 5:{//Cerrar sesión
 						menu_secundario = false;
 						break;}
 					
@@ -209,22 +219,125 @@ public class Cliente extends ITipoUsuario {
         fecha_reserva = year + "-" + mes_formateado + "-" + dia_formateado;
         hora_reserva = hora_formateada + ":00:00";
 
-        System.out.println(fecha_reserva + " " + hora_reserva);
-
         int cantidad_mesas = Math.ceilDiv(num_personas, 4);
 
         //Verificar que la fecha y hora de la reserva no estén en el pasado
         if(simulator.fechaPasada(fecha_reserva + " " + hora_reserva)) {
-            System.out.println("\n**ERROR** La fecha y hora de la reserva no pueden ser anteriores a la actual (" + simulator.getFechaFormateada() + ").");
+            System.out.println("\n**ERROR** \nLa fecha y hora de la reserva no pueden ser anteriores a la fecha y hora actual (" + simulator.getFechaFormateada() + ").");
             return;}
         //Si hay mesas disponibles, hacer la reserva
         else if (gestionBD.verificarMesasDisponibles(restaurante_id, cantidad_mesas, fecha_reserva, hora_reserva)==false) {
-            System.out.println("\n**ERROR** No hay/habrá suficientes mesas disponibles en el restaurante para hacer la reserva en la fecha y hora especificadas.");
+            System.out.println("\nESPACIO NO DISPONIBLE. \nNo hay/habrá suficientes mesas disponibles en el restaurante para hacer la reserva en la fecha y hora especificadas.");
             return;}
         else {
             int reserva_id = gestionBD.realizarReserva(cliente_id, restaurante_id, num_personas, cantidad_mesas, fecha_reserva, hora_reserva);
             if(reserva_id>0) {
                 System.out.println("\nRESERVA REALIZADA CON ÉXITO.\nA continuación se presentan los detalles de su reserva:\n");
-                gestionBD.detalles_reserva(reserva_id, restaurante_id);}}
+                gestionBD.detalles_reserva(reserva_id, restaurante_id);
+                int plato_favorito_id = establecer_pedido(reserva_id, gestionBD, scanInt);
+                registrar_historial_cliente(reserva_id, plato_favorito_id, gestionBD);}}
         }
+
+    public int establecer_pedido(int reserva_id, GestionBD gestionBD, Scanner scanInt) {
+        
+        List<String> platos = new ArrayList<>(Arrays.asList("Pizza hawaiana","Pizza de pepperoni","Pizza de queso","Pizza de vegetales","Pizza margarita","Pizza de jamón","Agua pura","Coca-cola","Coca-cola zero"));
+        Double[] precios = {70.00,65.00,65.00,70.00,70.00,65.00,15.00,10.00,10.00};
+        ArrayList<Integer> platos_pedido = new ArrayList<Integer>();
+
+        boolean terminar_pedido = false;
+        while(terminar_pedido==false){
+            System.out.println("\n╔════════════════════════════════════════════════╗\n║                MENU CAMPUS PIZZA               ║\n╠════════════════════════════════════════════════╣\n║ 1. Pizza hawaiana...................... Q70.00 ║\n║ 2. Pizza de pepperoni.................. Q65.00 ║\n║ 3. Pizza de queso...................... Q65.00 ║\n║ 4. Pizza de vegetales.................. Q70.00 ║\n║ 5. Pizza margarita..................... Q70.00 ║\n║ 6. Pizza de jamón...................... Q65.00 ║\n╠════════════════════════════════════════════════╣\n║ 7. Agua pura.......................... Q15.00  ║\n║ 8. Coca-cola.......................... Q10.00  ║\n║ 9. Coca-cola zero..................... Q10.00  ║\n╚════════════════════════════════════════════════╝");
+            System.out.println("\nIngrese el numero correspondiente al plato que desea agregar al pedido de su reserva (o '0' para dar por finalizado el pedido): ");
+
+            int decision_pedido = -1;
+            try {decision_pedido = scanInt.nextInt();}
+
+            catch(Exception e) {//En caso de que el usuario ingrese texto en lugar de un número 
+                System.out.println("\n**ERROR** La decision ingresada debe ser un numero.");
+                scanInt.nextLine();
+                continue;}
+            
+            if((decision_pedido>=0)&&(decision_pedido<=9)) {
+                
+                if(decision_pedido==0 && platos_pedido.size()<=0) {
+                    System.out.println("\n**ERROR** Debe agregar al menos un plato al pedido.");}
+                
+                else if(decision_pedido==0 && platos_pedido.size()>0) {
+                    terminar_pedido = true;}
+
+                else {
+                    System.out.println("\n¿Cuántas unidades de '" + platos.get(decision_pedido-1) + "' desea agregar al pedido? ");
+                    int cantidad_pedido = 0;
+                    try {cantidad_pedido = scanInt.nextInt();}
+
+                    catch(Exception e) {//En caso de que el usuario ingrese texto en lugar de un número 
+                        System.out.println("\n**ERROR** La cantidad ingresada debe ser un numero.");
+                        scanInt.nextLine();
+                        continue;}
+                    
+                    if(cantidad_pedido>0) {
+                        for(int i=0;i<cantidad_pedido;i++) {
+                            platos_pedido.add(decision_pedido-1);
+                            gestionBD.agregarPlatoPedido(reserva_id, decision_pedido);
+                            }}
+                    else {
+                        System.out.println("\n**ERROR** La cantidad ingresada debe ser mayor a 0.");}}}
+            else {
+                System.out.println("\n**ERROR** El numero ingresado no se encuentra entre las opciones disponibles.");}}
+
+            Map<String, Integer> contadorPlatos = new LinkedHashMap<>();
+
+            // Recorrer la lista de platos pedidos
+            for (Integer indice : platos_pedido) {
+                String plato = platos.get(indice); 
+                contadorPlatos.put(plato, contadorPlatos.getOrDefault(plato, 0) + 1);
+            }
+
+            // Extraer los platos únicos y las cantidades a dos listas
+            List<String> platos_unicos = new ArrayList<>(contadorPlatos.keySet());
+            List<Integer> cantidades = new ArrayList<>(contadorPlatos.values());
+            List<Double> precios_unitarios = new ArrayList<>();
+            List<Double> precios_totales = new ArrayList<>();
+            double total_general = 0.0;
+
+            for (String plato : platos_unicos) {
+                int indice = platos.indexOf(plato);
+                double precio_unitario = precios[indice];
+                precios_unitarios.add(precio_unitario);
+                int cantidad = contadorPlatos.get(plato);
+                double precio_total = precio_unitario * cantidad;
+                precios_totales.add(precio_total);
+                total_general += precio_total;
+            }
+
+            System.out.println("\nPEDIDO REGISTRADO EXITOSAMENTE.");
+            System.out.println("A continuación se presentan los detalles de su pedido:\n");
+
+            System.out.printf("%-21s %-10s %-10s %-10s\n", "Plato", "Cantidad", "Precio", "Total");
+            System.out.println("-----------------------------------------------------");
+            for (int p = 0; p < platos_unicos.size(); p++) {
+                System.out.printf("%-21s %-10d Q%-9.2f Q%-9.2f\n", platos_unicos.get(p), cantidades.get(p), precios_unitarios.get(p), precios_totales.get(p));}
+            System.out.println("-----------------------------------------------------");
+            System.out.printf("Total de la cuenta: Q%-9.2f\n", total_general);
+
+            return (platos.indexOf(determinarPlatoFavorito(platos_unicos, cantidades)) + 1);
+        }
+
+    public void registrar_historial_cliente(int reserva_id, int plato_favorito_id, GestionBD gestionBD) {
+        gestionBD.registrarHistorialCliente(reserva_id, plato_favorito_id);
+    }
+
+    public static String determinarPlatoFavorito(List<String> platos_unicos, List<Integer> cantidades) {
+        String favorito = null;
+        int maxCantidad = 0;
+
+        for (int i=0; i < platos_unicos.size(); i++) {
+            if (cantidades.get(i) > maxCantidad) {
+                maxCantidad = cantidades.get(i);
+                favorito = platos_unicos.get(i);
+            }
+        }
+
+        return favorito;
+    }
 }

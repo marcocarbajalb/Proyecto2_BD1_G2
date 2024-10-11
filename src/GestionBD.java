@@ -333,13 +333,40 @@ public class GestionBD {
                 System.out.println("\tFecha y hora: " + fecha + " " + hora);
                 System.out.println("\tNúmero de personas: " + num_personas + " (total de mesas: " + mesas.length + ")");
                 System.out.println("\tSu(s) número(s) de mesa: " + Arrays.toString(mesas).substring(1, Arrays.toString(mesas).length() - 1));
-            } else {
-                System.out.println("No se encontró una reserva con el ID proporcionado.");
-            }
+            } 
     
         } catch (SQLException e) {
             System.out.println("Error al obtener los detalles de la reserva: " + e.getMessage());
         }
-    }    
+    }
+    
+    public void agregarPlatoPedido(int reserva_id, int plato_id) {
+        String sql = "INSERT INTO pedidos (reserva_id, plato_id) VALUES (?, ?)";
+    
+        try (PreparedStatement statement = conexion.prepareStatement(sql)) {
+            statement.setInt(1, reserva_id);
+            statement.setInt(2, plato_id);
+    
+            statement.executeUpdate();
+    
+        } catch (SQLException e) {
+            System.out.println("Error al agregar el plato al pedido: " + e.getMessage());
+        }
+
+    }
+
+    public void registrarHistorialCliente(int reserva_id, int plato_favorito_id) {
+        String sql = "INSERT INTO historial_cliente (reserva_id, plato_favorito, observaciones) VALUES (?, ?, '')";
+    
+        try (PreparedStatement statement = conexion.prepareStatement(sql)) {
+            statement.setInt(1, reserva_id);
+            statement.setInt(2, plato_favorito_id);
+    
+            statement.executeUpdate();
+    
+        } catch (SQLException e) {
+            System.out.println("Error al registrar el historial de visita: " + e.getMessage());
+        }
+    }
     
 }
