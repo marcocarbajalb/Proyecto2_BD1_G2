@@ -305,7 +305,7 @@ public class GestionBD {
     }    
     
     public void detalles_reserva(int reserva_id, int restaurante_id) {
-        String sql = "SELECT r.reserva_id, r.fecha, r.hora, r.num_personas, ARRAY_AGG(m.num_mesa) AS mesas " +
+        String sql = "SELECT r.reserva_id, r.fecha, r.hora, r.num_personas, ARRAY_AGG(m.num_mesa ORDER BY m.num_mesa) AS mesas " +
                      "FROM reserva r " +
                      "JOIN reserva_mesa rm ON r.reserva_id = rm.reserva_id " +
                      "JOIN mesas m ON rm.mesa_id = m.mesa_id " + 
@@ -329,7 +329,45 @@ public class GestionBD {
                 Integer[] mesas = (Integer[]) (Object[]) mesasArray.getArray();
     
                 // Mostrar detalles de la reserva
-                System.out.println("\tReserva #" + id + " | Sede: " + restaurantes[restaurante_id - 1]);
+                System.out.println("\tReserva #" + id + " | Sucursal: " + restaurantes[restaurante_id - 1]);
+                System.out.println("\tFecha y hora: " + fecha + " " + hora);
+                System.out.println("\tNúmero de personas: " + num_personas + " (total de mesas: " + mesas.length + ")");
+                System.out.println("\tSu(s) número(s) de mesa: " + Arrays.toString(mesas).substring(1, Arrays.toString(mesas).length() - 1));
+            } 
+    
+        } catch (SQLException e) {
+            System.out.println("Error al obtener los detalles de la reserva: " + e.getMessage());
+        }
+    }
+
+    public void detalles_reserva_personal(int cliente_id, int reserva_id, int restaurante_id) {
+        String sql = "SELECT r.reserva_id, r.fecha, r.hora, r.num_personas, ARRAY_AGG(m.num_mesa) AS mesas " +
+                     "FROM reserva r " +
+                     "JOIN reserva_mesa rm ON r.reserva_id = rm.reserva_id " +
+                     "JOIN mesas m ON rm.mesa_id = m.mesa_id " + 
+                     "WHERE r.reserva_id = ? " +
+                     "GROUP BY r.reserva_id, r.fecha, r.hora, r.num_personas";
+
+        String[] restaurantes = {"Campus Pizza UVG", "Campus Pizza URL", "Campus Pizza UFM", "Campus Pizza UNIS", "Campus Pizza USAC"};
+    
+        try (PreparedStatement statement = conexion.prepareStatement(sql)) {
+            statement.setInt(1, reserva_id);
+    
+            ResultSet rs = statement.executeQuery();
+                
+            if (rs.next()) {
+                // Obtener los detalles de la reserva
+                int id = rs.getInt("reserva_id");
+                Date fecha = rs.getDate("fecha");
+                Time hora = rs.getTime("hora");
+                int num_personas = rs.getInt("num_personas");
+    
+                Array mesasArray = rs.getArray("mesas");
+                Integer[] mesas = (Integer[]) (Object[]) mesasArray.getArray();
+    
+                // Mostrar detalles de la reserva
+                System.out.println("\tReserva #" + id + " | Sucursal: " + restaurantes[restaurante_id - 1]);
+                System.out.println("\tA nombre de: " + obtenerNombreCompleto(cliente_id));
                 System.out.println("\tFecha y hora: " + fecha + " " + hora);
                 System.out.println("\tNúmero de personas: " + num_personas + " (total de mesas: " + mesas.length + ")");
                 System.out.println("\tSu(s) número(s) de mesa: " + Arrays.toString(mesas).substring(1, Arrays.toString(mesas).length() - 1));
@@ -373,7 +411,7 @@ public class GestionBD {
                 Integer[] mesas = (Integer[]) (Object[]) mesasArray.getArray();
                 
                 // Mostrar detalles de la reserva
-                System.out.println("\tReserva #" + id + " | Sede: " + restaurantes[restauranteId - 1]);
+                System.out.println("\tReserva #" + id + " | Sucursal: " + restaurantes[restauranteId - 1]);
                 System.out.println("\tFecha y hora: " + fecha + " " + hora);
                 System.out.println("\tNúmero de personas: " + num_personas + " (total de mesas: " + mesas.length + ")");
                 System.out.println("\tSu(s) número(s) de mesa: " + Arrays.toString(mesas).substring(1, Arrays.toString(mesas).length() - 1));
@@ -459,6 +497,30 @@ public class GestionBD {
         return reservas;
     }
 
+    public List<Integer> obtenerReservasClienteRestaurante(int cliente_id, int restaurante_id){
+        List<Integer> reservas = new ArrayList<>();
+        String sql = "SELECT r.reserva_id " +
+                     "FROM reserva r " +
+                     "JOIN usuario_reserva ur ON r.reserva_id = ur.reserva_id " +
+                     "WHERE ur.usuario_id = ? and r.restaurante_id = ?";
+    
+        try (PreparedStatement statement = conexion.prepareStatement(sql)) {
+            statement.setInt(1, cliente_id);
+            statement.setInt(2, restaurante_id);
+    
+            ResultSet rs = statement.executeQuery();
+    
+            while (rs.next()) {
+                reservas.add(rs.getInt("reserva_id"));
+            }
+    
+        } catch (SQLException e) {
+            System.out.println("Error al obtener las reservas del cliente: " + e.getMessage());
+        }
+    
+        return reservas;
+    }
+
     public void agregarObservacionesReserva(int reserva_id, String observaciones){
         String sql = "UPDATE historial_cliente " +
                      "SET observaciones = ? " +
@@ -503,6 +565,166 @@ public class GestionBD {
     
         } catch (SQLException e) {
             System.out.println("Error al obtener los detalles del historial: " + e.getMessage());
+        }
+    }
+
+    public int obtenerIDUsuario(String username) {
+        String sql = "SELECT usuario_id FROM usuarios WHERE username = ?";
+        int usuario_id = 0;
+    
+        try (PreparedStatement statement = conexion.prepareStatement(sql)) {
+            statement.setString(1, username);
+    
+            ResultSet rs = statement.executeQuery();
+    
+            if (rs.next()) {
+                usuario_id = rs.getInt("usuario_id");
+            }
+    
+        } catch (SQLException e) {
+            System.out.println("Error al obtener el ID del usuario: " + e.getMessage());
+        }
+    
+        return usuario_id;
+    }
+
+    public String obtenerNombreCompleto (int usuario_id){
+        String sql = "SELECT nombres, apellidos FROM usuarios WHERE usuario_id = ?";
+        String nombre_completo = "";
+    
+        try (PreparedStatement statement = conexion.prepareStatement(sql)) {
+            statement.setInt(1, usuario_id);
+    
+            ResultSet rs = statement.executeQuery();
+    
+            if (rs.next()) {
+                String nombres = rs.getString("nombres");
+                String apellidos = rs.getString("apellidos");
+                nombre_completo = nombres + " " + apellidos;
+            }
+    
+        } catch (SQLException e) {
+            System.out.println("Error al obtener el nombre completo del usuario: " + e.getMessage());
+        }
+    
+        return nombre_completo;
+    }
+
+    public List<Integer> listaMesasDisponibles(int restaurante_id){
+        List<Integer> mesas = new ArrayList<>();
+        String sql = "SELECT num_mesa " +
+                     "FROM mesas " +
+                     "WHERE restaurante_id = ? " +
+                     "AND estado = 'disponible'";
+    
+        try (PreparedStatement statement = conexion.prepareStatement(sql)) {
+            statement.setInt(1, restaurante_id);
+    
+            ResultSet rs = statement.executeQuery();
+    
+            while (rs.next()) {
+                mesas.add(rs.getInt("num_mesa"));
+            }
+    
+        } catch (SQLException e) {
+            System.out.println("Error al obtener las mesas disponibles: " + e.getMessage());
+        }
+    
+        return mesas;
+    }
+    
+    public List<Integer> listaClientes(int restaurante_id) {
+        String sql = "SELECT distinct u.usuario_id " + 
+                     "FROM usuarios u join usuario_reserva ur ON u.usuario_id = ur.usuario_id " +
+                     "JOIN reserva r ON ur.reserva_id = r.reserva_id " +
+                     "WHERE restaurante_id = ?";
+        List<Integer> ids_clientes = new ArrayList<>();
+        try (PreparedStatement statement = conexion.prepareStatement(sql)) {
+            statement.setInt(1, restaurante_id);
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                ids_clientes.add(rs.getInt("usuario_id"));
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al obtener los clientes: " + e.getMessage());
+        }
+        return ids_clientes;
+    }
+
+    public List<String> obtener_meseros (int restaurante_id) {
+        String sql = "SELECT u.nombres, u.apellidos, u.usuario_id " +
+                     "FROM usuarios u " +
+                     "JOIN personal p ON u.usuario_id = p.usuario_id " +
+                     "WHERE p.restaurante_id = ? " +
+                     "AND u.rol_id = 2";
+        List<String> meseros = new ArrayList<>();
+        try (PreparedStatement statement = conexion.prepareStatement(sql)) {
+            statement.setInt(1, restaurante_id);
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                meseros.add(rs.getString("nombres") + " " + rs.getString("apellidos") + " (ID: " + rs.getInt("usuario_id") + ")");
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al obtener los meseros: " + e.getMessage());
+        }
+        return meseros;
+    }
+
+    public List<String> obtener_gerentes (int restaurante_id) { 
+        String sql = "SELECT u.nombres, u.apellidos, u.usuario_id " +
+                     "FROM usuarios u " +
+                     "JOIN personal p ON u.usuario_id = p.usuario_id " +
+                     "WHERE p.restaurante_id = ? " +
+                     "AND u.rol_id = 3";
+        List<String> gerentes = new ArrayList<>();
+        try (PreparedStatement statement = conexion.prepareStatement(sql)) {
+            statement.setInt(1, restaurante_id);
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                gerentes.add(rs.getString("nombres") + " " + rs.getString("apellidos") + " (ID: " + rs.getInt("usuario_id") + ")");
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al obtener los gerentes: " + e.getMessage());
+        }
+        return gerentes;
+    }
+
+    public int total_cambios_bitacora() {
+        String sql = "SELECT COUNT(*) FROM bitacora_cambios";
+        int total_cambios = 0;
+        try (PreparedStatement statement = conexion.prepareStatement(sql)) {
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) {
+                total_cambios = rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al obtener el total de cambios en la auditoría: " + e.getMessage());
+        }
+        return total_cambios;
+    }
+
+    public void desplegarAuditoriaCambios(int limit) {
+        String sql = "SELECT * FROM bitacora_cambios ORDER BY fecha_modificacion DESC LIMIT ?";
+        try (PreparedStatement statement = conexion.prepareStatement(sql)) {
+            statement.setInt(1, limit);
+    
+            ResultSet rs = statement.executeQuery();
+            
+            // Encabezados de columna
+            System.out.printf("\n%-7s %-14s %-20s %-24s %-30s\n", "ID", "Acción", "Tabla modificada", "Llave primaria", "Fecha de modificación");
+            System.out.println("-----------------------------------------------------------------------------------------------");
+            
+            while (rs.next()) {
+                // Imprimir cada fila con el formato especificado
+                System.out.printf("%-7d %-14s %-20s %-24s %-30s\n",
+                    rs.getInt("bitacora_id"),
+                    rs.getString("accion"),
+                    rs.getString("tabla_modificada"),
+                    rs.getString("llave_primaria_modificacion"),
+                    rs.getTimestamp("fecha_modificacion"));
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al desplegar la auditoría de cambios: " + e.getMessage());
         }
     }
     

@@ -80,10 +80,10 @@ public class Cliente extends ITipoUsuario {
         boolean menu_secundario = true;
 		    while(menu_secundario) {
 		        System.out.println("\n░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░");
-                System.out.println("\n\t\t╔══════════════════════════════════════════╗\n\t\t║ Fecha y hora actual: " + simulator.getFechaFormateada() + " ║\n\t\t╚══════════════════════════════════════════╝");
+                System.out.println("\n\t       ╔══════════════════════════════════════════╗\n\t       ║ Fecha y hora actual: " + simulator.getFechaFormateada() + " ║\n\t       ╚══════════════════════════════════════════╝");
                 
                 System.out.println("\n[CLIENTE]\nBienvenido/a, "+ usuario_activo.getNombres() + " " + usuario_activo.getApellidos());
-		        System.out.println("\nIngrese el numero correspondiente a la opcion que desea realizar:\n1. Reservar en restaurante\n2. Consultar mis reservas\n3. Dejar observaciones/comentarios \n4. Consultar mi historial de visitas\n5. Cerrar sesión");
+		        System.out.println("\nIngrese el numero correspondiente a la opcion que desea realizar:\n1. Reservar en restaurante\n2. Consultar mis reservas y pedidos\n3. Dejar observaciones/comentarios \n4. Consultar mi historial de visitas\n5. Cerrar sesión");
 
 				int decision_secundaria = 0;
 				try {decision_secundaria = scanInt.nextInt();}
@@ -100,8 +100,8 @@ public class Cliente extends ITipoUsuario {
                         hacer_reserva(cliente_id, gestionBD, simulator, scanString, scanInt);
 						break;}
 					
-					case 2:{//Consultar mis reservas
-						System.out.println("\n╠═════════════════════════CONSULTAR MIS RESERVAS════════════════════════╣");
+					case 2:{//Consultar mis reservas y pedidos
+						System.out.println("\n╠═════════════════════CONSULTAR MIS RESERVAS Y PEDIDOS════════════════════╣");
 						int cliente_id = usuario_activo.getUsuario_id();
                         consultar_reservas(cliente_id, gestionBD);					
 						break;}
@@ -119,7 +119,8 @@ public class Cliente extends ITipoUsuario {
 						break;}
 					
 					case 5:{//Cerrar sesión
-						menu_secundario = false;
+						System.out.println("\t\t     ┌─────────────────────────────┐\n\t\t     " + "│ Sesión cerrada exitosamente │\n\t\t     └─────────────────────────────┘");
+                        menu_secundario = false;
 						break;}
 					
 					default:{//Opción no disponible (programación defensiva)
@@ -133,16 +134,15 @@ public class Cliente extends ITipoUsuario {
         String fecha_reserva = "", hora_reserva="";
         
         //[Registro de datos para hacer la reserva]
-        
         cliente_id = usuario_id;
 
-        //Solicitar al usuario la sede del restaurante en el que desea reservar
+        //Solicitar al usuario la sucursal del restaurante en el que desea reservar
 		String [] restaurantes = {"Campus Pizza UVG","Campus Pizza URL","Campus Pizza UFM","Campus Pizza UNIS", "Campus Pizza USAC"};
 
         int decision_restaurante = 0;
         boolean seleccion_restaurante = true;
         while(seleccion_restaurante) {
-            System.out.println("\nIngrese el numero correspondiente a la sede en la que desea reservar: ");
+            System.out.println("\nIngrese el numero correspondiente a la sucursal en la que desea reservar: ");
             for(int i=0;i<restaurantes.length;i++) {
                 System.out.println((i+1) + ". " + restaurantes[i]);}
             
@@ -193,7 +193,22 @@ public class Cliente extends ITipoUsuario {
                 scanString.nextLine();
                 continue;}
             
-            if((dia>0)&&(dia<=31)&&(mes>0)&&(mes<=12)&&(year>=2024)) {
+            if((mes==2)&&(dia==29)&&(((year%4==0)&&(year%100!=0))||(year%400==0))) { //Único caso para años bisiestos
+                seleccion_fecha = false;}
+            
+            else if((mes==2)&&(dia>28)) {
+                if(((year%4==0)&&(year%100!=0))||(year%400==0)){
+                    System.out.println("\n**ERROR** El mes de febrero tiene 29 días para el año ingresado.");
+                    continue;}
+                else{
+                    System.out.println("\n**ERROR** El mes de febrero solo tiene 28 días para el año ingresado.");
+                    continue;}}
+            
+            else if((mes==4||mes==6||mes==9||mes==11)&&(dia>30)) {
+                System.out.println("\n**ERROR** El mes ingresado solo tiene 30 días.");
+                continue;}
+            
+            else if((dia>0)&&(dia<=31)&&(mes>0)&&(mes<=12)&&(year>=2024)) {
                 seleccion_fecha = false;} 
             
             else {
