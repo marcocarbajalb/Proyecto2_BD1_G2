@@ -11,7 +11,7 @@ import java.sql.SQLException;
 
 public class ConexionBD {
     
-    private final String url = "jdbc:postgresql://localhost:5432/Proyecto2"; // URL de la base de datos
+    private final String url = "jdbc:postgresql://localhost:5432/Proyecto2?useUnicode=yes&characterEncoding=UTF-8"; // URL de la base de datos
     private final String usuario = "postgres"; // Usuario de la base de datos
     private String password; // Contraseña de la base de datos
     private Connection conexion = null;

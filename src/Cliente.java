@@ -96,22 +96,26 @@ public class Cliente extends ITipoUsuario {
 				switch(decision_secundaria) {
 					case 1:{//Reservar en restaurante
 						System.out.println("\n╠════════════════════════RESERVAR EN RESTAURANTE════════════════════════╣");
-                        hacer_reserva(usuario_activo, gestionBD, simulator, scanString, scanInt);
+                        int cliente_id = usuario_activo.getUsuario_id();
+                        hacer_reserva(cliente_id, gestionBD, simulator, scanString, scanInt);
 						break;}
 					
 					case 2:{//Consultar mis reservas
 						System.out.println("\n╠═════════════════════════CONSULTAR MIS RESERVAS════════════════════════╣");
-											
+						int cliente_id = usuario_activo.getUsuario_id();
+                        consultar_reservas(cliente_id, gestionBD);					
 						break;}
 					
                     case 3:{//Dejar observaciones/comentarios
                         System.out.println("\n╠═════════════════════DEJAR OBERVACIONES/COMENTARIOS════════════════════╣");
-
+                        int cliente_id = usuario_activo.getUsuario_id();
+                        dejar_observaciones(cliente_id, gestionBD, scanString, scanInt);
                         break;}
 					
                     case 4:{//Consultar mi historial de visitas
 						System.out.println("\n╠════════════════════CONSULTAR MI HISTORIAL DE VISITAS══════════════════╣");
-
+                        int cliente_id = usuario_activo.getUsuario_id();
+                        consultar_historial(cliente_id, gestionBD);
 						break;}
 					
 					case 5:{//Cerrar sesión
@@ -122,7 +126,7 @@ public class Cliente extends ITipoUsuario {
 						System.out.println("\n**ERROR**\nEl numero ingresado no se encuentra entre las opciones disponibles.");}}}
     }
 
-    public void hacer_reserva(ITipoUsuario usuario_activo, GestionBD gestionBD, TimeSimulator simulator, Scanner scanString, Scanner scanInt){
+    public void hacer_reserva(int usuario_id, GestionBD gestionBD, TimeSimulator simulator, Scanner scanString, Scanner scanInt){
 
         //Atributos necesarios para hacer una reserva
         Integer cliente_id, restaurante_id, num_personas=0, dia=0, mes=0, year=0, hora=0;
@@ -130,7 +134,7 @@ public class Cliente extends ITipoUsuario {
         
         //[Registro de datos para hacer la reserva]
         
-        cliente_id = usuario_activo.getUsuario_id();
+        cliente_id = usuario_id;
 
         //Solicitar al usuario la sede del restaurante en el que desea reservar
 		String [] restaurantes = {"Campus Pizza UVG","Campus Pizza URL","Campus Pizza UFM","Campus Pizza UNIS", "Campus Pizza USAC"};
@@ -138,7 +142,7 @@ public class Cliente extends ITipoUsuario {
         int decision_restaurante = 0;
         boolean seleccion_restaurante = true;
         while(seleccion_restaurante) {
-            System.out.println("\nIngrese el numero correspondiente al restaurante en el que desea reservar: ");
+            System.out.println("\nIngrese el numero correspondiente a la sede en la que desea reservar: ");
             for(int i=0;i<restaurantes.length;i++) {
                 System.out.println((i+1) + ". " + restaurantes[i]);}
             
@@ -235,7 +239,7 @@ public class Cliente extends ITipoUsuario {
                 System.out.println("\nRESERVA REALIZADA CON ÉXITO.\nA continuación se presentan los detalles de su reserva:\n");
                 gestionBD.detalles_reserva(reserva_id, restaurante_id);
                 int plato_favorito_id = establecer_pedido(reserva_id, gestionBD, scanInt);
-                registrar_historial_cliente(reserva_id, plato_favorito_id, gestionBD);}}
+                gestionBD.registrarHistorialCliente(reserva_id, plato_favorito_id);}}
         }
 
     public int establecer_pedido(int reserva_id, GestionBD gestionBD, Scanner scanInt) {
@@ -323,10 +327,6 @@ public class Cliente extends ITipoUsuario {
             return (platos.indexOf(determinarPlatoFavorito(platos_unicos, cantidades)) + 1);
         }
 
-    public void registrar_historial_cliente(int reserva_id, int plato_favorito_id, GestionBD gestionBD) {
-        gestionBD.registrarHistorialCliente(reserva_id, plato_favorito_id);
-    }
-
     public static String determinarPlatoFavorito(List<String> platos_unicos, List<Integer> cantidades) {
         String favorito = null;
         int maxCantidad = 0;
@@ -339,5 +339,59 @@ public class Cliente extends ITipoUsuario {
         }
 
         return favorito;
+    }
+
+    public void consultar_reservas(int cliente_id, GestionBD gestionBD) {
+        List<Integer> reservas_ids = gestionBD.obtenerReservasCliente(cliente_id);
+        if(reservas_ids.size()>0) {
+            for(int i=0;i<reservas_ids.size();i++) {
+                System.out.println("\n(" + (i+1) + ")");
+                gestionBD.datos_completos_reserva(reservas_ids.get(i));}
+        }
+        else {
+            System.out.println("\nOPCION NO DISPONIBLE. \nNo se han encontrado reservas asociadas a su cuenta.");}
+    }
+
+    public void dejar_observaciones(int cliente_id, GestionBD gestionBD, Scanner scanString, Scanner scanInt) {
+        List<Integer> reservas_ids = gestionBD.obtenerReservasCliente(cliente_id);
+        if(reservas_ids.size()>0) {
+            int i;
+            System.out.println("\nIngrese el numero correspondiente a la reserva en la que desea dejar observaciones/comentarios sobre su experiencia: ");
+            for(i=0;i<reservas_ids.size();i++) {
+                System.out.println((i+1) + ". Reserva #" + reservas_ids.get(i));}
+            System.out.println((i+1) + ". Regresar al menú principal");
+            int decision_reserva = 0;
+            try {decision_reserva = scanInt.nextInt();}
+
+            catch(Exception e) {//En caso de que el usuario ingrese texto en lugar de un número 
+                System.out.println("\n**ERROR** La decision ingresada debe ser un numero.");
+                scanInt.nextLine();
+                return;}
+            
+            if((decision_reserva>=1)&&(decision_reserva<=reservas_ids.size())) {
+                System.out.println("\nIngrese las observaciones/comentarios sobre su experiencia que desea dejar para la reserva #" + reservas_ids.get(decision_reserva-1) + ": ");
+                String observaciones = scanString.nextLine();
+                gestionBD.agregarObservacionesReserva(reservas_ids.get(decision_reserva-1), observaciones);
+                System.out.println("\nOBSERVACIONES/COMENTARIOS REGISTRADOS EXITOSAMETE.\n¡Gracias por compartir tu opinión con nosotros! Campus Pizza agradece tu preferencia.");}
+            
+            else if(decision_reserva==(i+1)) {
+                return;}
+            
+            else {
+                System.out.println("\n**ERROR** El numero ingresado no se encuentra entre las opciones disponibles.");}
+        }
+        else {
+            System.out.println("\nOPCION NO DISPONIBLE. \nNo se han encontrado reservas asociadas a su cuenta.");}
+    }
+
+    public void consultar_historial(int cliente_id, GestionBD gestionBD) {
+        List<Integer> reservas_ids = gestionBD.obtenerReservasCliente(cliente_id);
+        if(reservas_ids.size()>0) {
+            for(int i=0;i<reservas_ids.size();i++) {
+                System.out.println("\n(" + (i+1) + ")");
+                gestionBD.datos_completos_historial(reservas_ids.get(i));}
+        }
+        else {
+            System.out.println("\nHISTORIAL VACIO. \nTodavía no ha realizado ninguna reserva.");}
     }
 }

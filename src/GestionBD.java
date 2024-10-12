@@ -308,7 +308,7 @@ public class GestionBD {
         String sql = "SELECT r.reserva_id, r.fecha, r.hora, r.num_personas, ARRAY_AGG(m.num_mesa) AS mesas " +
                      "FROM reserva r " +
                      "JOIN reserva_mesa rm ON r.reserva_id = rm.reserva_id " +
-                     "JOIN mesas m ON rm.mesa_id = m.mesa_id " +  // Unir con la tabla mesas
+                     "JOIN mesas m ON rm.mesa_id = m.mesa_id " + 
                      "WHERE r.reserva_id = ? " +
                      "GROUP BY r.reserva_id, r.fecha, r.hora, r.num_personas";
         String[] restaurantes = {"Campus Pizza UVG", "Campus Pizza URL", "Campus Pizza UFM", "Campus Pizza UNIS", "Campus Pizza USAC"};
@@ -339,7 +339,74 @@ public class GestionBD {
             System.out.println("Error al obtener los detalles de la reserva: " + e.getMessage());
         }
     }
-    
+
+    public void datos_completos_reserva(int reserva_id) {
+        String sqlReserva = "SELECT r.reserva_id, r.fecha, r.hora, r.num_personas, r.restaurante_id, " +
+                            "ARRAY_AGG(m.num_mesa) AS mesas " +
+                            "FROM reserva r " +
+                            "JOIN reserva_mesa rm ON r.reserva_id = rm.reserva_id " +
+                            "JOIN mesas m ON rm.mesa_id = m.mesa_id " +
+                            "WHERE r.reserva_id = ? " +
+                            "GROUP BY r.reserva_id, r.fecha, r.hora, r.num_personas, r.restaurante_id";
+        
+        String sqlPlatos = "SELECT p.nombre_plato, p.precio, COUNT(pd.plato_id) AS cantidad " +
+                           "FROM pedidos pd " +
+                           "JOIN platos p ON pd.plato_id = p.plato_id " +
+                           "WHERE pd.reserva_id = ? " +
+                           "GROUP BY p.nombre_plato, p.precio " +
+                           "ORDER BY p.nombre_plato";
+        
+        String[] restaurantes = {"Campus Pizza UVG", "Campus Pizza URL", "Campus Pizza UFM", "Campus Pizza UNIS", "Campus Pizza USAC"};
+        
+        try (PreparedStatement statementReserva = conexion.prepareStatement(sqlReserva)) {
+            statementReserva.setInt(1, reserva_id);
+            ResultSet rsReserva = statementReserva.executeQuery();
+            
+            if (rsReserva.next()) {
+                // Obtener detalles de la reserva
+                int id = rsReserva.getInt("reserva_id");
+                Date fecha = rsReserva.getDate("fecha");
+                Time hora = rsReserva.getTime("hora");
+                int num_personas = rsReserva.getInt("num_personas");
+                int restauranteId = rsReserva.getInt("restaurante_id");
+                Array mesasArray = rsReserva.getArray("mesas");
+                Integer[] mesas = (Integer[]) (Object[]) mesasArray.getArray();
+                
+                // Mostrar detalles de la reserva
+                System.out.println("\tReserva #" + id + " | Sede: " + restaurantes[restauranteId - 1]);
+                System.out.println("\tFecha y hora: " + fecha + " " + hora);
+                System.out.println("\tNúmero de personas: " + num_personas + " (total de mesas: " + mesas.length + ")");
+                System.out.println("\tSu(s) número(s) de mesa: " + Arrays.toString(mesas).substring(1, Arrays.toString(mesas).length() - 1));
+                System.out.println("\n\tPlatos pedidos:");
+                
+                // Segunda consulta para obtener los platos pedidos
+                try (PreparedStatement statementPlatos = conexion.prepareStatement(sqlPlatos)) {
+                    statementPlatos.setInt(1, reserva_id);
+                    ResultSet rsPlatos = statementPlatos.executeQuery();
+                    
+                    double totalCuenta = 0.0;
+                    
+                    while (rsPlatos.next()) {
+                        String nombrePlato = rsPlatos.getString("nombre_plato");
+                        double precioPlato = rsPlatos.getDouble("precio");
+                        int cantidad = rsPlatos.getInt("cantidad");
+                        
+                        System.out.println("\t\tx" + cantidad + " - " + nombrePlato);
+                        totalCuenta += cantidad * precioPlato;
+                    }
+                    
+                    // Mostrar el total de la cuenta
+                    System.out.println("\tTotal de la cuenta: Q" + totalCuenta);
+                }
+            } else {
+                System.out.println("No se encontraron detalles para la reserva con ID: " + reserva_id);
+            }
+            
+        } catch (SQLException e) {
+            System.out.println("Error al obtener los detalles de la reserva: " + e.getMessage());
+        }
+    }    
+
     public void agregarPlatoPedido(int reserva_id, int plato_id) {
         String sql = "INSERT INTO pedidos (reserva_id, plato_id) VALUES (?, ?)";
     
@@ -366,6 +433,76 @@ public class GestionBD {
     
         } catch (SQLException e) {
             System.out.println("Error al registrar el historial de visita: " + e.getMessage());
+        }
+    }
+
+    public List<Integer> obtenerReservasCliente(int cliente_id){
+        List<Integer> reservas = new ArrayList<>();
+        String sql = "SELECT r.reserva_id " +
+                     "FROM reserva r " +
+                     "JOIN usuario_reserva ur ON r.reserva_id = ur.reserva_id " +
+                     "WHERE ur.usuario_id = ?";
+    
+        try (PreparedStatement statement = conexion.prepareStatement(sql)) {
+            statement.setInt(1, cliente_id);
+    
+            ResultSet rs = statement.executeQuery();
+    
+            while (rs.next()) {
+                reservas.add(rs.getInt("reserva_id"));
+            }
+    
+        } catch (SQLException e) {
+            System.out.println("Error al obtener las reservas del cliente: " + e.getMessage());
+        }
+    
+        return reservas;
+    }
+
+    public void agregarObservacionesReserva(int reserva_id, String observaciones){
+        String sql = "UPDATE historial_cliente " +
+                     "SET observaciones = ? " +
+                     "WHERE reserva_id = ?";
+    
+        try (PreparedStatement statement = conexion.prepareStatement(sql)) {
+            
+            statement.setString(1, observaciones);
+            statement.setInt(2, reserva_id);
+    
+            statement.executeUpdate();
+    
+        } catch (SQLException e) {
+            System.out.println("Error al agregar observaciones a la reserva: " + e.getMessage());
+        }
+    }
+
+    public void datos_completos_historial(int reserva_id){
+        String sql = "SELECT * " +
+                     "FROM historial_cliente " +
+                     "WHERE reserva_id = ?";
+
+        String[] platos = {"Pizza hawaiana","Pizza de pepperoni","Pizza de queso","Pizza de vegetales","Pizza margarita","Pizza de jamón","Agua pura","Coca-cola","Coca-cola zero"};
+        
+        try (PreparedStatement statement = conexion.prepareStatement(sql)) {
+            statement.setInt(1, reserva_id);
+    
+            ResultSet rs = statement.executeQuery();
+    
+            if (rs.next()) {
+                // Obtener detalles del historial
+                int historia_id = rs.getInt("historial_id");
+                int id = rs.getInt("reserva_id");
+                int plato_favorito = rs.getInt("plato_favorito");
+                String observaciones = rs.getString("observaciones");
+    
+                // Mostrar detalles del historial
+                System.out.println("\tHistorial (ID " + historia_id + ") de la reserva #" + id);
+                System.out.println("\tPlato favorito: " + platos[plato_favorito-1]);
+                System.out.println("\tObservaciones: " + observaciones);
+            } 
+    
+        } catch (SQLException e) {
+            System.out.println("Error al obtener los detalles del historial: " + e.getMessage());
         }
     }
     

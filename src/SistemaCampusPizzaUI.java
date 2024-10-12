@@ -38,7 +38,7 @@ public class SistemaCampusPizzaUI {
                 //Menú que se le mostrará al usuario
                 System.out.println("\n\n░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░\n░░░░░░░░░░░░░░░░ BIENVENIDO/A AL SISTEMA DE CAMPUS PIZZA ░░░░░░░░░░░░░░░░\n░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░");
                 System.out.println("\n\t\t╔══════════════════════════════════════════╗\n\t\t║ Fecha y hora actual: " + simulator.getFechaFormateada() + " ║\n\t\t╚══════════════════════════════════════════╝");
-                System.out.println("\nIngrese el numero correspondiente a la opcion que desea realizar:\n1. Registrarse.\n2. Iniciar sesión.\n3. Salir del programa.");
+                System.out.println("\nIngrese el numero correspondiente a la opcion que desea realizar:\n1. Registrarse\n2. Iniciar sesión\n3. Salir del programa");
                 
                 int decision_principal = 0;
                 try {decision_principal = scanInt.nextInt();}
@@ -120,10 +120,13 @@ public class SistemaCampusPizzaUI {
         //[Registro de datos para crear el usuario]
 
  		//Solicitar al usuario sus nombres y apellidos
-        System.out.println("\nIngrese su(s) nombre(s) [ej. 'Nombre1 Nombre2']:");
-        nombres = scanString.nextLine().trim();
-        System.out.println("\nIngrese su(s) apellido(s) [ej. 'Apellido1 Apellido2']:");
-        apellidos = scanString.nextLine().trim();
+        try{
+            System.out.println("\nIngrese su(s) nombre(s) [ej. 'Nombre1 Nombre2']:");
+            nombres = scanString.nextLine().trim();
+            System.out.println("\nIngrese su(s) apellido(s) [ej. 'Apellido1 Apellido2']:");
+            apellidos = scanString.nextLine().trim();}
+        catch(Exception e) {
+            System.out.println("\n**ERROR** Ha ocurrido un error al ingresar sus nombres y apellidos.");}
 
         String [] sedes_restaurante = {"Campus Pizza UVG","Campus Pizza URL","Campus Pizza UFM","Campus Pizza UNIS", "Campus Pizza USAC"};
         int decision_restaurante = 0;
