@@ -29,17 +29,16 @@ public class SistemaCampusPizzaUI {
             GestionBD gestionBD = new GestionBD(conexion);
 
             //Iniciar la simulación del tiempo
-            TimeSimulator simulator = new TimeSimulator();
-            simulator.setTimeSpeed(60.0); // El tiempo pasa 60 veces más rápido (cada minuto en la vida real es una hora en el simulador)
+            TimeSimulator simulator = new TimeSimulator(conexion);
             simulator.start();
             
             boolean menu_principal = true;
             while(menu_principal) {
                 
                 //Menú que se le mostrará al usuario
-                System.out.println("\n\n-------------------BIENVENIDO/A AL SISTEMA DE CAMPUS PIZZA-------------------");
-                System.out.println("\t\t[Fecha y hora actual: " + simulator.getFechaFormateada() + "]");
-                System.out.println("\nIngrese el numero correspondiente a la opcion que desea realizar:\n1. Registrarse.\n2. Iniciar sesión.\n3. Salir del programa.");
+                System.out.println("\n\n░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░\n░░░░░░░░░░░░░░░░ BIENVENIDO/A AL SISTEMA DE CAMPUS PIZZA ░░░░░░░░░░░░░░░░\n░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░");
+                System.out.println("\n\t       ╔══════════════════════════════════════════╗\n\t       ║ Fecha y hora actual: " + simulator.getFechaFormateada() + " ║\n\t       ╚══════════════════════════════════════════╝");
+                System.out.println("\nIngrese el numero correspondiente a la opcion que desea realizar:\n1. Registrarse\n2. Iniciar sesión\n3. Salir del programa");
                 
                 int decision_principal = 0;
                 try {decision_principal = scanInt.nextInt();}
@@ -51,12 +50,12 @@ public class SistemaCampusPizzaUI {
                     
                 switch(decision_principal) {
                     case 1:{//Registrarse
-                        System.out.println("\n----------------------------REGISTRARSE----------------------------");
+                        System.out.println("\n╠══════════════════════════════REGISTRARSE══════════════════════════════╣");
                         registrarUsuario(gestionBD, scanString, scanInt);
                         break;}
                     
                     case 2:{//Iniciar sesión
-                        System.out.println("\n---------------------------INICIAR SESION---------------------------");
+                        System.out.println("\n╠═════════════════════════════INICIAR SESION════════════════════════════╣");
                         iniciarSesion(gestionBD, simulator, scanString, scanInt);
                         break;}
                     
@@ -65,7 +64,7 @@ public class SistemaCampusPizzaUI {
                         menu_principal = false;
                         
                         //Mostrar al ususario que ha abandonado el programa
-                        System.out.println("\nHa abandonado el programa exitosamente.\n");
+                        System.out.println("\t\t┌────────────────────────────────────────┐\n\t\t" + "│ Ha abandonado el programa exitosamente │\n\t\t└────────────────────────────────────────┘");
                         
                         //Cerrar todos los scanners
                         scanString.close();
@@ -126,14 +125,14 @@ public class SistemaCampusPizzaUI {
         System.out.println("\nIngrese su(s) apellido(s) [ej. 'Apellido1 Apellido2']:");
         apellidos = scanString.nextLine().trim();
 
-        String [] sedes_restaurante = {"Campus Pizza UVG","Campus Pizza URL","Campus Pizza UFM","Campus Pizza UNIS", "Campus Pizza USAC"};
+        String [] sucursales_restaurante = {"Campus Pizza UVG","Campus Pizza URL","Campus Pizza UFM","Campus Pizza UNIS", "Campus Pizza USAC"};
         int decision_restaurante = 0;
         if(tipo_perfil==2 || tipo_perfil==3) {
             boolean seleccion_restaurante = true;
             while(seleccion_restaurante) {
-                System.out.println("\nIngrese el numero correspondiente a la sede de Campus Pizza a la que pertenece: ");
-                for(int i=0;i<sedes_restaurante.length;i++) {
-                    System.out.println((i+1) + ". " + sedes_restaurante[i]);}
+                System.out.println("\nIngrese el numero correspondiente a la sucursal de Campus Pizza a la que pertenece: ");
+                for(int i=0;i<sucursales_restaurante.length;i++) {
+                    System.out.println((i+1) + ". " + sucursales_restaurante[i]);}
                 
                 try {
                     decision_restaurante = scanInt.nextInt();} 
@@ -142,7 +141,7 @@ public class SistemaCampusPizzaUI {
                     scanInt.nextLine();
                     continue;}
                 
-                if((decision_restaurante>=1)&&(decision_restaurante<=sedes_restaurante.length)) {
+                if((decision_restaurante>=1)&&(decision_restaurante<=sucursales_restaurante.length)) {
                     seleccion_restaurante = false;} 
                 
                 else {
@@ -187,9 +186,8 @@ public class SistemaCampusPizzaUI {
         if(tipo_perfil==1 || tipo_perfil==4) {
             System.out.println(nombres + " " + apellidos + " (" + tipos_de_perfiles[tipo_perfil-1] + "), su nombre de usuario es: " + username + ", y su password es: " + password + ".");}
         else {
-            System.out.println(nombres + " " + apellidos + " (" + tipos_de_perfiles[tipo_perfil-1] + "), su nombre de usuario es: " + username + ", y su password es: " + password + ".\nUsted trabaja en: " + sedes_restaurante[restaurante_id-1] + ".");}
+            System.out.println(nombres + " " + apellidos + " (" + tipos_de_perfiles[tipo_perfil-1] + "), su nombre de usuario es: " + username + ", y su password es: " + password + ".\nUsted trabaja en: " + sucursales_restaurante[restaurante_id-1] + ".");}
         }
-
 
 	public static void iniciarSesion(GestionBD gestionBD, TimeSimulator simulator, Scanner scanString, Scanner scanInt) {
 	    	
