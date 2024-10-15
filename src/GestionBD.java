@@ -734,20 +734,22 @@ public class GestionBD {
 
      public List<Object[]> obtenerTop10ClientesFrecuentes() {
         List<Object[]> topClientes = new ArrayList<>();
-        String sql = "SELECT u.usuario_id as id, u.username as cliente, COUNT(ur.reserva_id) AS frecuencia " +
-                     "FROM usuario_reserva ur " +
-                     "JOIN usuarios u ON ur.usuario_id = u.usuario_id " +
-                     "GROUP BY u.usuario_id, u.username " +
-                     "ORDER BY frecuencia DESC " +
-                     "LIMIT 10;";
+        String sql = "SELECT u.usuario_id as id, u.nombres, u.apellidos, COUNT(ur.reserva_id) AS frecuencia " +
+                    "FROM usuario_reserva ur " +
+                    "JOIN usuarios u ON ur.usuario_id = u.usuario_id " +
+                    "GROUP BY u.usuario_id, u.nombres, u.apellidos " +
+                    "ORDER BY frecuencia DESC " +
+                    "LIMIT 10;";
+
     
         try (PreparedStatement statement = conexion.prepareStatement(sql)) {
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
-                Object[] cliente = new Object[3];
+                Object[] cliente = new Object[4]; //con 4 posiciones de index
                 cliente[0] = resultSet.getInt("id");
-                cliente[1] = resultSet.getString("cliente");
-                cliente[2] = resultSet.getInt("frecuencia");
+                cliente[1] = resultSet.getString("nombres");
+                cliente[2] = resultSet.getString("apellidos");
+                cliente[3] = resultSet.getInt("frecuencia");
                 topClientes.add(cliente);
             }
         } catch (SQLException e) {

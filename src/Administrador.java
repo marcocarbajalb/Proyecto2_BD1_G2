@@ -288,8 +288,15 @@ public class Administrador extends ITipoUsuario {
                     
                         // Verifica si la lista tiene elementos
                         if (!topClientes.isEmpty()) {
+                            int contador = 1;
                             for (Object[] cliente : topClientes) {
-                                System.out.printf("Cliente: %s (ID: %d) - Reservas: %d\n", cliente[1], cliente[0], cliente[2]);
+                                System.out.printf("%d. %s %s (ID: %d) - Reservas: %d\n",
+                                                    contador,
+                                                    cliente[1], // su nombre
+                                                    cliente[2], // apellido
+                                                    cliente[0], // id
+                                                    cliente[3]); //la cantidad de reservas lol
+                                contador++; // se va aumentando con cada iteración
                             }
                         } else {
                             System.out.println("No se encontraron clientes frecuentes porque aun no hay información de reserva.");
