@@ -19,6 +19,7 @@ public class Cliente extends ITipoUsuario {
     private String username;
     private String password;
     public final String rol = "cliente";
+    private int frecuencia; // Para reporte ii.
 
     @Override
     public void setUsuario_id(int usuario_id) {
@@ -73,6 +74,16 @@ public class Cliente extends ITipoUsuario {
     @Override
     public String getRol() {
         return rol;
+    }
+
+    // Métodos para la frecuencia
+   
+    public void setFrecuencia(int frecuencia) {
+        this.frecuencia = frecuencia;
+    }
+
+    public int getFrecuencia() {
+        return frecuencia;
     }
     
     @Override

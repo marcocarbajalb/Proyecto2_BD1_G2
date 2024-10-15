@@ -259,6 +259,15 @@ public class Administrador extends ITipoUsuario {
 					
 					default:{//Opción no disponible (programación defensiva)
 						System.out.println("\n**ERROR**\nEl numero ingresado no se encuentra entre las opciones disponibles.");}}}
+
+                        
+    }
+
+    private static void mostrarTopClientes(List<ClienteFrecuente> topClientes) {
+        System.out.println("Top 10 Clientes Frecuentes:");
+        for (ClienteFrecuente cliente : topClientes) {
+            System.out.println(cliente);
+        }
     }
 
     public void menuReportes(GestionBD gestionBD, Scanner scanString, Scanner scanInt) {
@@ -278,10 +287,15 @@ public class Administrador extends ITipoUsuario {
                 case 1:{//Top 10 de los platos más vendidos
                     System.out.println("\n├───────────────────TOP 10 DE LOS PLATOS MAS VENDIDOS───────────────────┤");
 
-                    break;}
+                    break;
+}
 
                 case 2:{//Top 10 de los clientes más frecuentes
                     System.out.println("\n├─────────────────TOP 10 DE LOS CLIENTES MAS FRECUENTES─────────────────┤");
+
+                    // Obtiene la lista de los clientes más frecuentes
+                    List<ClienteFrecuente> topClientes = gestionBD.obtenerTopClientesFrecuentes();
+                    mostrarTopClientes(topClientes);
 
                     break;}
                 

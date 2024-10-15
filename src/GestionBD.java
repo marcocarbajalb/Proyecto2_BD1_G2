@@ -727,5 +727,44 @@ public class GestionBD {
             System.out.println("Error al desplegar la auditoría de cambios: " + e.getMessage());
         }
     }
-    
+
+    /*
+     * MÉTODOS PARA OBTENER LOS QUERIES DEL REPORTE FINAL
+     */
+    // Método para obtener el Top 10 de los clientes más frecuentes
+// Método que obtendrá los 10 clientes más frecuentes
+public List<ClienteFrecuente> obtenerTopClientesFrecuentes() {
+    String sql = "SELECT u.usuario_id as id, u.username as cliente, COUNT(ur.reserva_id) AS frecuencia " +
+                 "FROM usuario_reserva ur " +
+                 "JOIN usuarios u ON ur.usuario_id = u.usuario_id " +
+                 "GROUP BY u.usuario_id, u.username " +
+                 "ORDER BY frecuencia DESC " +
+                 "LIMIT 10";
+
+    List<ClienteFrecuente> topClientes = new ArrayList<>();
+
+    try (PreparedStatement statement = conexion.prepareStatement(sql);
+         ResultSet resultSet = statement.executeQuery()) {
+
+        while (resultSet.next()) {
+            int id = resultSet.getInt("id");
+            String cliente = resultSet.getString("cliente");
+            int frecuencia = resultSet.getInt("frecuencia");
+
+            // Crear un objeto ClienteFrecuente y agregarlo a la lista
+            ClienteFrecuente clienteFrecuente = new ClienteFrecuente(id, cliente, frecuencia);
+            topClientes.add(clienteFrecuente);
+        }
+
+    } catch (SQLException e) {
+        // Manejo del error
+        System.err.println("Error al obtener el top de clientes frecuentes: " + e.getMessage());
+        e.printStackTrace();
+    }
+
+    return topClientes; 
+    }
 }
+
+    
+    
