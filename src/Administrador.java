@@ -263,13 +263,6 @@ public class Administrador extends ITipoUsuario {
                         
     }
 
-    private static void mostrarTopClientes(List<ClienteFrecuente> topClientes) {
-        System.out.println("Top 10 Clientes Frecuentes:");
-        for (ClienteFrecuente cliente : topClientes) {
-            System.out.println(cliente);
-        }
-    }
-
     public void menuReportes(GestionBD gestionBD, Scanner scanString, Scanner scanInt) {
         boolean menu_reportes = true;
         while(menu_reportes) {
@@ -287,17 +280,22 @@ public class Administrador extends ITipoUsuario {
                 case 1:{//Top 10 de los platos más vendidos
                     System.out.println("\n├───────────────────TOP 10 DE LOS PLATOS MAS VENDIDOS───────────────────┤");
 
-                    break;
-}
-
-                case 2:{//Top 10 de los clientes más frecuentes
-                    System.out.println("\n├─────────────────TOP 10 DE LOS CLIENTES MAS FRECUENTES─────────────────┤");
-
-                    // Obtiene la lista de los clientes más frecuentes
-                    List<ClienteFrecuente> topClientes = gestionBD.obtenerTopClientesFrecuentes();
-                    mostrarTopClientes(topClientes);
-
                     break;}
+
+                    case 2: {//Top 10 de los clientes más frecuentes
+                        System.out.println("\n├─────────────────TOP 10 DE LOS CLIENTES MAS FRECUENTES─────────────────┤");
+                        List<Object[]> topClientes = gestionBD.obtenerTop10ClientesFrecuentes();
+                    
+                        // Verifica si la lista tiene elementos
+                        if (!topClientes.isEmpty()) {
+                            for (Object[] cliente : topClientes) {
+                                System.out.printf("Cliente: %s (ID: %d) - Reservas: %d\n", cliente[1], cliente[0], cliente[2]);
+                            }
+                        } else {
+                            System.out.println("No se encontraron clientes frecuentes porque aun no hay información de reserva.");
+                        }
+                        break;
+                    }
                 
                 case 3:{//Top 5 de los clientes con mayores reservas y su preferencia de platos
                     System.out.println("\n├─TOP 5 DE LOS CLIENTES CON MAYORES RESERVAS Y SU PREFERENCIA DE PLATOS─┤");
