@@ -10,6 +10,10 @@
  import java.util.List;
  import java.util.Map;
  import java.util.Scanner;
+ import java.util.Date;
+ import java.util.Collections;
+
+
 
 public class Mesero extends ITipoUsuario {
     
@@ -20,6 +24,10 @@ public class Mesero extends ITipoUsuario {
     private String password;
     public final String rol = "mesero";
     private int restaurante_id;
+    // variables locales para poder trabajar con lo del inventario...
+    private List<String> nombresInsumos = new ArrayList<>();
+    private List<Integer> cantidades = new ArrayList<>();
+    private List<Date> fechasCaducidad = new ArrayList<>();
 
     @Override
     public void setUsuario_id(int usuario_id) {
@@ -137,8 +145,22 @@ public class Mesero extends ITipoUsuario {
                     
                     case 4:{//Ver inventario
                         System.out.println("\n╠═════════════════════════════VER INVENTARIO════════════════════════════╣");
+                        ver_inventario(restaurante_id, gestionBD);
+                    
+                        // Opción de ordenar
+                        System.out.println("1. Ordenar por fecha de caducidad");
+                        System.out.println("2. Ordenar por mayor cantidad");
+                        int opcion = scanInt.nextInt(); // Suponiendo que usas un scanner para leer la opción
 
-                        break;}
+                        if (opcion == 1) {
+                            ordenarPorFechaCaducidad();
+                        } else if (opcion == 2) {
+                            ordenarPorMayorCantidad();
+                        } 
+                        // Volver a mostrar el inventario ordenado
+                        ver_inventario(restaurante_id, gestionBD);
+                        break;
+                    }
 
                     case 5:{//Cerrar sesión
                         System.out.println("\t\t     ┌─────────────────────────────┐\n\t\t     " + "│ Sesión cerrada exitosamente │\n\t\t     └─────────────────────────────┘");
@@ -425,4 +447,88 @@ public class Mesero extends ITipoUsuario {
             System.out.println("\nNo hay reservas ni pedidos registrados en el sistema para la sucursal " + getSucursal_restaurante() + ".");}
     }
 
+    // funcion par aver el inventario... 
+    public void ver_inventario(int restaurante_id, GestionBD gestionBD) {
+        // Obtener el inventario del restaurante
+        nombresInsumos.clear();
+        cantidades.clear();
+        fechasCaducidad.clear();
+    
+        // Obtener los datos del inventario
+        List<List<Object>> inventario = gestionBD.obtenerInventarioPorRestaurante(restaurante_id);
+        
+        for (List<Object> item : inventario) {
+            nombresInsumos.add((String) item.get(0)); // Nombre del insumo
+            cantidades.add((Integer) item.get(1));    // Cantidad
+            fechasCaducidad.add((Date) item.get(2));  // Fecha de caducidad
+        }
+    
+        // Mostrar inventario
+        System.out.println("\n╔═══════════════════════════════════════════════╗");
+        System.out.printf("%-30s %-10s %-15s%n", "Nombre Insumo", "Cantidad", "Fecha Caducidad");
+        System.out.println("╚═══════════════════════════════════════════════╝");
+        for (int i = 0; i < nombresInsumos.size(); i++) {
+            System.out.printf("%-30s %-10d %-15s%n", nombresInsumos.get(i), cantidades.get(i), fechasCaducidad.get(i));
+        }
+    }
+
+    // ordenar el inventario por fechas de caducidad...
+    public void ordenarPorFechaCaducidad() {
+        // Crear una lista de índices para ordenar
+        List<Integer> indices = new ArrayList<>();
+        for (int i = 0; i < nombresInsumos.size(); i++) {
+            indices.add(i);
+        }
+    
+        // Ordenar los índices por fecha de caducidad
+        Collections.sort(indices, (i1, i2) -> fechasCaducidad.get(i1).compareTo(fechasCaducidad.get(i2)));
+    
+        // Reordenar las listas
+        List<String> nombresInsumosOrdenados = new ArrayList<>();
+        List<Integer> cantidadesOrdenadas = new ArrayList<>();
+        List<Date> fechasCaducidadOrdenadas = new ArrayList<>();
+    
+        for (int index : indices) {
+            nombresInsumosOrdenados.add(nombresInsumos.get(index));
+            cantidadesOrdenadas.add(cantidades.get(index));
+            fechasCaducidadOrdenadas.add(fechasCaducidad.get(index));
+        }
+    
+        // Actualizar las listas originales
+        nombresInsumos.clear();
+        cantidades.clear();
+        fechasCaducidad.clear();
+        nombresInsumos.addAll(nombresInsumosOrdenados);
+        cantidades.addAll(cantidadesOrdenadas);
+        fechasCaducidad.addAll(fechasCaducidadOrdenadas);
+    }
+    //ordenar inventario por cantidad... 
+    public void ordenarPorMayorCantidad() {
+        // Crear una lista de índices para ordenar
+        List<Integer> indices = new ArrayList<>();
+        for (int i = 0; i < nombresInsumos.size(); i++) {
+            indices.add(i);
+        }
+    
+        // Ordenar los índices por cantidad
+        Collections.sort(indices, (i1, i2) -> Integer.compare(cantidades.get(i2), cantidades.get(i1)));
+    
+        // Reordenar las listas
+        List<String> nombresInsumosOrdenados = new ArrayList<>();
+        List<Integer> cantidadesOrdenadas = new ArrayList<>();
+    
+        for (int index : indices) {
+            nombresInsumosOrdenados.add(nombresInsumos.get(index));
+            cantidadesOrdenadas.add(cantidades.get(index));
+        }
+    
+        // Actualizar las listas originales
+        nombresInsumos.clear();
+        cantidades.clear();
+        nombresInsumos.addAll(nombresInsumosOrdenados);
+        cantidades.addAll(cantidadesOrdenadas);
+    }
+
+
+    
 }

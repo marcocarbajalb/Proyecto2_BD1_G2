@@ -729,9 +729,15 @@ public class GestionBD {
     }
 
     /*
+     * 
+     * 
      * MÉTODOS PARA OBTENER LOS QUERIES DEL REPORTE FINAL
+     * 
+     * 
      */
 
+     //2. Top 10 clientes más Frecuentes
+     //2. Top 10 clientes más Frecuentes
      public List<Object[]> obtenerTop10ClientesFrecuentes() {
         List<Object[]> topClientes = new ArrayList<>();
         String sql = "SELECT u.usuario_id as id, u.nombres, u.apellidos, COUNT(ur.reserva_id) AS frecuencia " +
@@ -757,7 +763,135 @@ public class GestionBD {
         }
         return topClientes;
     }
+/* metodos para poder obtener los datos de inventario. */
+public List<List<Object>> obtenerInventarioPorRestaurante(int restaurante_id) {
+    String sql = "SELECT i.nombre, inv.cantidad, inv.fecha_caducidad " +
+                 "FROM inventario inv " +
+                 "JOIN insumos i ON inv.insumo_id = i.insumo_id " +
+                 "WHERE inv.restaurante_id = ?";
+    
+    List<List<Object>> inventario = new ArrayList<>();
+    
+    try (PreparedStatement statement = conexion.prepareStatement(sql)) {
+        statement.setInt(1, restaurante_id);
+        ResultSet rs = statement.executeQuery();
+        while (rs.next()) {
+            List<Object> item = new ArrayList<>();
+            item.add(rs.getString("nombre"));
+            item.add(rs.getInt("cantidad"));
+            item.add(rs.getDate("fecha_caducidad"));
+            inventario.add(item);
+        }
+    } catch (SQLException e) {
+        System.out.println("Error al obtener el inventario: " + e.getMessage());
+    }
+    return inventario;
+}
 
+// consulta para las alertas del 15% de insumos... 
+public List<List<Object>> obtenerInsumosBajoPorcentaje(int porcentaje) {
+    String sql = "SELECT i.nombre, inv.cantidad " +
+                 "FROM inventario inv " +
+                 "JOIN insumos i ON inv.insumo_id = i.insumo_id " +
+                 "WHERE inv.cantidad < (? / 100.0) * 100";
+    
+    List<List<Object>> insumosBajos = new ArrayList<>();
+    
+    try (PreparedStatement statement = conexion.prepareStatement(sql)) {
+        statement.setInt(1, porcentaje);
+        ResultSet rs = statement.executeQuery();
+        
+        while (rs.next()) {
+            List<Object> insumo = new ArrayList<>();
+            insumo.add(rs.getString("nombre")); // Nombre del insumo
+            insumo.add(rs.getInt("cantidad"));  // Cantidad restante
+            insumosBajos.add(insumo);
+        }
+        
+    } catch (SQLException e) {
+        System.out.println("Error al obtener insumos bajos: " + e.getMessage());
+    }
+    
+    return insumosBajos;
+}
+
+public void actualizarCantidadInsumo(int restauranteId, String nombreInsumo, int nuevaCantidad) {
+    String insumoIdQuery = "SELECT insumo_id FROM insumos WHERE nombre = ?";
+    String actualizarCantidadQuery = "UPDATE inventario " +
+                                      "SET cantidad = ? " +
+                                      "WHERE restaurante_id = ? " +
+                                      "AND insumo_id = ?";
+
+    try (PreparedStatement insumoStatement = conexion.prepareStatement(insumoIdQuery)) {
+        // Obtener insumo_id
+        insumoStatement.setString(1, nombreInsumo);
+        ResultSet resultSet = insumoStatement.executeQuery();
+
+        if (resultSet.next()) {
+            long insumoId = resultSet.getLong("insumo_id");
+
+            try (PreparedStatement updateStatement = conexion.prepareStatement(actualizarCantidadQuery)) {
+                // Asignar parámetros
+                updateStatement.setInt(1, nuevaCantidad);
+                updateStatement.setInt(2, restauranteId);
+                updateStatement.setLong(3, insumoId);
+
+                // Ejecutar la actualización
+                int filasActualizadas = updateStatement.executeUpdate();
+
+                if (filasActualizadas > 0) {
+                    System.out.println("Cantidad de insumo actualizada correctamente.");
+                } else {
+                    System.out.println("No se encontró el insumo en el inventario para el restaurante.");
+                }
+            }
+        } else {
+            System.out.println("No se encontró el insumo con ese nombre.");
+        }
+    } catch (SQLException e) {
+        System.out.println("Error al actualizar la cantidad de insumo: " + e.getMessage());
+    }
+}
+
+    // Método para obtener Top 5 de Clientes con Mayores Reservas y su Preferencia de Platos
+    public List<Object[]> obtenerTop5ClientesConPreferencias() {
+        List<Object[]> topClientesPlatos = new ArrayList<>();
+        String sql = "WITH RankedDishes AS ( " +
+                "  SELECT u.usuario_id, p.nombre_plato, COUNT(*) AS plato_count, " +
+                "         DENSE_RANK() OVER (PARTITION BY u.usuario_id ORDER BY COUNT(*) DESC) AS rnk " +
+                "  FROM usuario_reserva ur " +
+                "  JOIN usuarios u ON ur.usuario_id = u.usuario_id " +
+                "  JOIN pedidos pd ON ur.reserva_id = pd.reserva_id " +
+                "  JOIN platos p ON pd.plato_id = p.plato_id " +
+                "  GROUP BY u.usuario_id, p.nombre_plato " +
+                ") " +
+                "SELECT u.usuario_id, u.nombres, u.apellidos, STRING_AGG(rd.nombre_plato, ', ') AS platos_favoritos " +
+                "FROM usuarios u " +
+                "JOIN RankedDishes rd ON u.usuario_id = rd.usuario_id " +
+                "WHERE rd.rnk = 1 " +
+                "GROUP BY u.usuario_id, u.username " +
+                "ORDER BY (SELECT COUNT(*) FROM usuario_reserva ur2 WHERE ur2.usuario_id = u.usuario_id) DESC " +
+                "LIMIT 5;";
+    
+        try (PreparedStatement statement = conexion.prepareStatement(sql)) {
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                Object[] cliente = new Object[4]; // Con 4 index, yeah
+                cliente[0] = resultSet.getInt("usuario_id");
+                cliente[1] = resultSet.getString("nombres");
+                cliente[2] = resultSet.getString("apellidos");
+                 // Formateamos la cadena de platos favoritos
+                String platosFavoritos = resultSet.getString("platos_favoritos");
+                String salidaPlatos = String.format("Platos favoritos: %s", platosFavoritos);
+
+                cliente[3] = salidaPlatos;
+                topClientesPlatos.add(cliente);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return topClientesPlatos;
+    }
 }
 
     

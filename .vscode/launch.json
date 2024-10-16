@@ -6,6 +6,13 @@
             "name": "SistemaCampusPizzaUI",
             "request": "launch",
             "mainClass": "SistemaCampusPizzaUI",
+            "projectName": "Proyecto2_BD1_G2_9bc5c6f3"
+        },
+        {
+            "type": "java",
+            "name": "SistemaCampusPizzaUI",
+            "request": "launch",
+            "mainClass": "SistemaCampusPizzaUI",
             "projectName": "Proyecto2_BD1_G2_a9f9eb0a"
         },
         {

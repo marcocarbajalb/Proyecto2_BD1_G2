@@ -10,6 +10,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Date;
+import java.util.Collections;
 
 public class Gerente extends ITipoUsuario {
     
@@ -20,6 +22,10 @@ public class Gerente extends ITipoUsuario {
     private String password;
     public final String rol = "gerente";
     private int restaurante_id;
+    // variables locales para poder trabajar con lo del inventario...
+    private List<String> nombresInsumos = new ArrayList<>();
+    private List<Integer> cantidades = new ArrayList<>();
+    private List<Date> fechasCaducidad = new ArrayList<>();
 
     @Override
     public void setUsuario_id(int usuario_id) {
@@ -138,8 +144,37 @@ public class Gerente extends ITipoUsuario {
                     
                     case 4:{//Gestionar inventario
                         System.out.println("\n╠══════════════════════════GESTIONAR INVENTARIO═════════════════════════╣");
-
-                        break;}
+                            System.out.println("1. Mostrar inventario");
+                            System.out.println("2. Cambiar cantidad de insumos");
+                            System.out.println("3. Observar inventario en orden de cantidad");
+                            System.out.println("4. Observar inventario en orden de caducidad");
+                            
+                            int opcion = scanInt.nextInt();
+                            switch (opcion) {
+                                case 1:
+                                    ver_inventario(restaurante_id, gestionBD);
+                                    break;
+                                case 2:
+                                    System.out.println("Ingrese el nombre del insumo:");
+                                    String nombreInsumo = scanString.nextLine().trim();
+                                    System.out.println("Ingrese la nueva cantidad:");
+                                    int nuevaCantidad = scanInt.nextInt();
+                                    cambiarCantidadInsumo(restaurante_id, nombreInsumo, nuevaCantidad, gestionBD);
+                                    break;
+                                case 3:
+                                    ordenarPorMayorCantidad();
+                                    ver_inventario(restaurante_id, gestionBD); // Mostrar el inventario reordenado
+                                    break;
+                                case 4:
+                                    ordenarPorFechaCaducidad();
+                                    ver_inventario(restaurante_id, gestionBD); // Mostrar el inventario reordenado
+                                    break;
+                                default:
+                                    System.out.println("Opción no válida.");
+                                    break;
+                            }
+                            break;
+                    }
 
                     case 5:{//Ver historial de clientes
                         System.out.println("\n╠═══════════════════════VER HISTORIAL DE CLIENTES═══════════════════════╣");
@@ -458,5 +493,92 @@ public class Gerente extends ITipoUsuario {
                 num_cliente++;}}
         else {
             System.out.println("\nNo hay visitas de clientes registradas en el sistema para la sucursal " + getSucursal_restaurante() + ".");}
+    }
+
+    // -------- GESTION DE INVENTARIOS ---------------- 
+        public void ver_inventario(int restaurante_id, GestionBD gestionBD) {
+            // Obtener el inventario del restaurante
+            nombresInsumos.clear();
+            cantidades.clear();
+            fechasCaducidad.clear();
+        
+            // Obtener los datos del inventario
+            List<List<Object>> inventario = gestionBD.obtenerInventarioPorRestaurante(restaurante_id);
+            
+            for (List<Object> item : inventario) {
+                nombresInsumos.add((String) item.get(0)); // Nombre del insumo
+                cantidades.add((Integer) item.get(1));    // Cantidad
+                fechasCaducidad.add((Date) item.get(2));  // Fecha de caducidad
+            }
+        
+            // Mostrar inventario
+            System.out.println("\n╔═══════════════════════════════════════════════╗");
+            System.out.printf("%-30s %-10s %-15s%n", "Nombre Insumo", "Cantidad", "Fecha Caducidad");
+            System.out.println("╚═══════════════════════════════════════════════╝");
+            for (int i = 0; i < nombresInsumos.size(); i++) {
+                System.out.printf("%-30s %-10d %-15s%n", nombresInsumos.get(i), cantidades.get(i), fechasCaducidad.get(i));
+            }
+        }
+
+        public void cambiarCantidadInsumo(int restauranteId, String nombreInsumo, int nuevaCantidad, GestionBD gestionBD) {
+            gestionBD.actualizarCantidadInsumo(restauranteId, nombreInsumo, nuevaCantidad);
+        }
+
+        //ordenar inventario por cantidad... 
+    public void ordenarPorMayorCantidad() {
+        // Crear una lista de índices para ordenar
+        List<Integer> indices = new ArrayList<>();
+        for (int i = 0; i < nombresInsumos.size(); i++) {
+            indices.add(i);
+        }
+    
+        // Ordenar los índices por cantidad
+        Collections.sort(indices, (i1, i2) -> Integer.compare(cantidades.get(i2), cantidades.get(i1)));
+    
+        // Reordenar las listas
+        List<String> nombresInsumosOrdenados = new ArrayList<>();
+        List<Integer> cantidadesOrdenadas = new ArrayList<>();
+    
+        for (int index : indices) {
+            nombresInsumosOrdenados.add(nombresInsumos.get(index));
+            cantidadesOrdenadas.add(cantidades.get(index));
+        }
+    
+        // Actualizar las listas originales
+        nombresInsumos.clear();
+        cantidades.clear();
+        nombresInsumos.addAll(nombresInsumosOrdenados);
+        cantidades.addAll(cantidadesOrdenadas);
+    }
+
+    // ordenar el inventario por fechas de caducidad...
+    public void ordenarPorFechaCaducidad() {
+        // Crear una lista de índices para ordenar
+        List<Integer> indices = new ArrayList<>();
+        for (int i = 0; i < nombresInsumos.size(); i++) {
+            indices.add(i);
+        }
+    
+        // Ordenar los índices por fecha de caducidad
+        Collections.sort(indices, (i1, i2) -> fechasCaducidad.get(i1).compareTo(fechasCaducidad.get(i2)));
+    
+        // Reordenar las listas
+        List<String> nombresInsumosOrdenados = new ArrayList<>();
+        List<Integer> cantidadesOrdenadas = new ArrayList<>();
+        List<Date> fechasCaducidadOrdenadas = new ArrayList<>();
+    
+        for (int index : indices) {
+            nombresInsumosOrdenados.add(nombresInsumos.get(index));
+            cantidadesOrdenadas.add(cantidades.get(index));
+            fechasCaducidadOrdenadas.add(fechasCaducidad.get(index));
+        }
+    
+        // Actualizar las listas originales
+        nombresInsumos.clear();
+        cantidades.clear();
+        fechasCaducidad.clear();
+        nombresInsumos.addAll(nombresInsumosOrdenados);
+        cantidades.addAll(cantidadesOrdenadas);
+        fechasCaducidad.addAll(fechasCaducidadOrdenadas);
     }
 }

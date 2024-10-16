@@ -2,6 +2,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.Duration;
 import java.sql.Connection;
+import java.util.List;
+
 
 public class TimeSimulator {
     private LocalDateTime simulatedTime;
@@ -41,6 +43,7 @@ public class TimeSimulator {
                 simulatedTime = simulatedTime.plus(Duration.ofMinutes(halfHoursPassed * 30));
                 lastUpdate = now;
                 actualizarMesas();
+                verificarInsumosBajos(); 
             }
         }
         return simulatedTime;
@@ -61,6 +64,24 @@ public class TimeSimulator {
         String hora = tiempoActual.toLocalTime().format(DateTimeFormatter.ofPattern("HH"));
         String hora_modificada = hora + ":00:00";
 
-        gestionBD.actualizarEstadoMesas(fecha, hora_modificada);}
+        gestionBD.actualizarEstadoMesas(fecha, hora_modificada);
+    }
 
+    // alerta para verificar los insumos con cantidades bajas... 
+    private void verificarInsumosBajos() {
+        // Llamar a la función en GestionBD para obtener los insumos por debajo del 20%
+        List<List<Object>> insumosBajos = gestionBD.obtenerInsumosBajoPorcentaje(20);
+        
+        if (insumosBajos.isEmpty()) {
+            System.out.println("No hay insumos con menos del 20% de su capacidad.");
+        } else {
+            System.out.println("\n╠═════════════════════════════INSUMOS BAJOS═════════════════════════════╣");
+            System.out.printf("%-30s %-10s%n", "Nombre Insumo", "Cantidad Restante");
+            for (List<Object> insumo : insumosBajos) {
+                String nombreInsumo = (String) insumo.get(0);
+                int cantidad = (int) insumo.get(1);
+                System.out.printf("%-30s %-10d%n", nombreInsumo, cantidad);
+            }
+        }
+    }
 }
