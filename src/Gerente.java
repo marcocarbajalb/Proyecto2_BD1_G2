@@ -103,13 +103,13 @@ public class Gerente extends ITipoUsuario {
                 System.out.println("\n\t       ╔══════════════════════════════════════════╗\n\t       ║ Fecha y hora actual: " + simulator.getFechaFormateada() + " ║\n\t       ╚══════════════════════════════════════════╝");
                                 
                 System.out.println("\n[GERENTE | " +  ((Gerente) usuario_activo).getSucursal_restaurante() + "]\nBienvenido/a, "+ usuario_activo.getNombres() + " " + usuario_activo.getApellidos());
-		        System.out.println("\nIngrese el numero correspondiente a la opcion que desea realizar:\n1. Hacer reserva\n2. Ver disponibilidad de mesas\n3. Consultar reservas y pedidos\n4. Gestionar inventario\n5. Ver historial de clientes\n6. Ver meseros\n7. Cerrar sesión");
+		        System.out.println("\nIngrese el número correspondiente a la opción que desea realizar:\n1. Hacer reserva\n2. Ver disponibilidad de mesas\n3. Consultar reservas y pedidos\n4. Gestionar inventario\n5. Ver historial de clientes\n6. Ver meseros\n7. Cerrar sesión");
 
 				int decision_secundaria = 0;
 				try {decision_secundaria = scanInt.nextInt();}
 
 				catch(Exception e) {//En caso de que el usuario ingrese texto en lugar de un número 
-					System.out.println("\n**ERROR** La decision ingresada debe ser un numero.");
+					System.out.println("\n**ERROR** La decision ingresada debe ser un número.");
 					scanInt.nextLine();
 					continue;}
 				
@@ -144,12 +144,19 @@ public class Gerente extends ITipoUsuario {
                     
                     case 4:{//Gestionar inventario
                         System.out.println("\n╠══════════════════════════GESTIONAR INVENTARIO═════════════════════════╣");
-                            System.out.println("1. Mostrar inventario");
-                            System.out.println("2. Cambiar cantidad de insumos");
-                            System.out.println("3. Observar inventario en orden de cantidad");
-                            System.out.println("4. Observar inventario en orden de caducidad");
+                        
+                        boolean validar_menu_inventario = true;
+                        while(validar_menu_inventario) {
+                        
+                            System.out.println("\nIngrese el número correspondiente a la opción que desea realizar:\n1. Mostrar inventario\n2. Cambiar cantidad de insumos\n3. Observar inventario en orden de cantidad\n4. Observar inventario en orden de caducidad\n5. Regresar al menú principal");
+                                
+                            int opcion = 0;
+                            try {opcion = scanInt.nextInt();}
+                            catch(Exception e) {//En caso de que el usuario ingrese texto en lugar de un número 
+                                System.out.println("\n**ERROR** La decision ingresada debe ser un número.");
+                                scanInt.nextLine();
+                                    continue;}    
                             
-                            int opcion = scanInt.nextInt();
                             switch (opcion) {
                                 case 1:
                                     ver_inventario(restaurante_id, gestionBD);
@@ -169,12 +176,13 @@ public class Gerente extends ITipoUsuario {
                                     ordenarPorFechaCaducidad();
                                     ver_inventario(restaurante_id, gestionBD); // Mostrar el inventario reordenado
                                     break;
-                                default:
-                                    System.out.println("Opción no válida.");
+                                case 5:
+                                    validar_menu_inventario = false;
                                     break;
-                            }
-                            break;
-                    }
+                                default:
+                                    System.out.println("\n**ERROR**\nEl número ingresado no se encuentra entre las opciones disponibles.");
+                                    break;}}
+                        break;}
 
                     case 5:{//Ver historial de clientes
                         System.out.println("\n╠═══════════════════════VER HISTORIAL DE CLIENTES═══════════════════════╣");
@@ -199,7 +207,7 @@ public class Gerente extends ITipoUsuario {
                         break;}
 					
 					default:{//Opción no disponible (programación defensiva)
-						System.out.println("\n**ERROR**\nEl numero ingresado no se encuentra entre las opciones disponibles.");}}}
+						System.out.println("\n**ERROR**\nEl número ingresado no se encuentra entre las opciones disponibles.");}}}
     }
 
     public void hacer_reserva(int usuario_id, GestionBD gestionBD, TimeSimulator simulator, Scanner scanString, Scanner scanInt){
@@ -218,11 +226,11 @@ public class Gerente extends ITipoUsuario {
         //Solicitar al usuario el número de personas para la reserva
         boolean seleccion_num_personas = true;
         while(seleccion_num_personas) {
-            System.out.println("\nIngrese el numero de personas para la reserva: ");
+            System.out.println("\nIngrese el número de personas para la reserva: ");
             try {
                 num_personas = scanInt.nextInt();} 
             catch(Exception e) {
-                System.out.println("\n**ERROR** La decision ingresada debe ser un numero.");
+                System.out.println("\n**ERROR** La decision ingresada debe ser un número.");
                 scanInt.nextLine();
                 continue;}
             
@@ -230,7 +238,7 @@ public class Gerente extends ITipoUsuario {
                 seleccion_num_personas = false;} 
             
             else {
-                System.out.println("\n**ERROR** El numero de personas debe ser mayor a 0.");}}
+                System.out.println("\n**ERROR** El número de personas debe ser mayor a 0.");}}
         
         //Solicitar al usuario la fecha de la reserva
         boolean seleccion_fecha = true;
@@ -320,13 +328,13 @@ public class Gerente extends ITipoUsuario {
         boolean terminar_pedido = false;
         while(terminar_pedido==false){
             System.out.println("\n╔════════════════════════════════════════════════╗\n║                MENU CAMPUS PIZZA               ║\n╠════════════════════════════════════════════════╣\n║ 1. Pizza hawaiana...................... Q70.00 ║\n║ 2. Pizza de pepperoni.................. Q65.00 ║\n║ 3. Pizza de queso...................... Q65.00 ║\n║ 4. Pizza de vegetales.................. Q70.00 ║\n║ 5. Pizza margarita..................... Q70.00 ║\n║ 6. Pizza de jamón...................... Q65.00 ║\n╠════════════════════════════════════════════════╣\n║ 7. Agua pura.......................... Q15.00  ║\n║ 8. Coca-cola.......................... Q10.00  ║\n║ 9. Coca-cola zero..................... Q10.00  ║\n╚════════════════════════════════════════════════╝");
-            System.out.println("\nIngrese el numero correspondiente al plato que desea agregar al pedido de la reserva (o '0' para dar por finalizado el pedido): ");
+            System.out.println("\nIngrese el número correspondiente al plato que desea agregar al pedido de la reserva (o '0' para dar por finalizado el pedido): ");
 
             int decision_pedido = -1;
             try {decision_pedido = scanInt.nextInt();}
 
             catch(Exception e) {//En caso de que el usuario ingrese texto en lugar de un número 
-                System.out.println("\n**ERROR** La decision ingresada debe ser un numero.");
+                System.out.println("\n**ERROR** La decision ingresada debe ser un número.");
                 scanInt.nextLine();
                 continue;}
             
@@ -344,7 +352,7 @@ public class Gerente extends ITipoUsuario {
                     try {cantidad_pedido = scanInt.nextInt();}
 
                     catch(Exception e) {//En caso de que el usuario ingrese texto en lugar de un número 
-                        System.out.println("\n**ERROR** La cantidad ingresada debe ser un numero.");
+                        System.out.println("\n**ERROR** La cantidad ingresada debe ser un número.");
                         scanInt.nextLine();
                         continue;}
                     
@@ -356,7 +364,7 @@ public class Gerente extends ITipoUsuario {
                     else {
                         System.out.println("\n**ERROR** La cantidad ingresada debe ser mayor a 0.");}}}
             else {
-                System.out.println("\n**ERROR** El numero ingresado no se encuentra entre las opciones disponibles.");}}
+                System.out.println("\n**ERROR** El número ingresado no se encuentra entre las opciones disponibles.");}}
 
         Map<String, Integer> contadorPlatos = new LinkedHashMap<>();
 
@@ -512,9 +520,9 @@ public class Gerente extends ITipoUsuario {
             }
         
             // Mostrar inventario
-            System.out.println("\n╔═══════════════════════════════════════════════╗");
-            System.out.printf("%-30s %-10s %-15s%n", "Nombre Insumo", "Cantidad", "Fecha Caducidad");
-            System.out.println("╚═══════════════════════════════════════════════╝");
+            System.out.println();
+            System.out.printf("%-30s %-10s %-15s%n", "Nombre del insumo", "Cantidad", "Fecha de caducidad");
+            System.out.println("--------------------------------------------------------------");
             for (int i = 0; i < nombresInsumos.size(); i++) {
                 System.out.printf("%-30s %-10d %-15s%n", nombresInsumos.get(i), cantidades.get(i), fechasCaducidad.get(i));
             }

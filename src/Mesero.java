@@ -105,13 +105,13 @@ public class Mesero extends ITipoUsuario {
                 System.out.println("\n\t       ╔══════════════════════════════════════════╗\n\t       ║ Fecha y hora actual: " + simulator.getFechaFormateada() + " ║\n\t       ╚══════════════════════════════════════════╝");
                 
                 System.out.println("\n[MESERO | " +  ((Mesero) usuario_activo).getSucursal_restaurante() + "]\nBienvenido/a, "+ usuario_activo.getNombres() + " " + usuario_activo.getApellidos());
-		        System.out.println("\nIngrese el numero correspondiente a la opcion que desea realizar:\n1. Hacer reserva\n2. Ver disponibilidad de mesas\n3. Consultar reservas y pedidos\n4. Ver inventario\n5. Cerrar sesión");
+		        System.out.println("\nIngrese el número correspondiente a la opción que desea realizar:\n1. Hacer reserva\n2. Ver disponibilidad de mesas\n3. Consultar reservas y pedidos\n4. Ver inventario\n5. Cerrar sesión");
 
 				int decision_secundaria = 0;
 				try {decision_secundaria = scanInt.nextInt();}
 
 				catch(Exception e) {//En caso de que el usuario ingrese texto en lugar de un número 
-					System.out.println("\n**ERROR** La decision ingresada debe ser un numero.");
+					System.out.println("\n**ERROR** La decision ingresada debe ser un número.");
 					scanInt.nextLine();
 					continue;}
 				
@@ -148,19 +148,29 @@ public class Mesero extends ITipoUsuario {
                         ver_inventario(restaurante_id, gestionBD);
                     
                         // Opción de ordenar
-                        System.out.println("1. Ordenar por fecha de caducidad");
-                        System.out.println("2. Ordenar por mayor cantidad");
-                        int opcion = scanInt.nextInt(); // Suponiendo que usas un scanner para leer la opción
+                        boolean validar_opcion = true;
+                        int opcion = 0;
+                        while (validar_opcion) {
+                            System.out.println("\nIngrese el número correspondiente al filtro que desea aplicar:\n1. Ordenar por fecha de caducidad \n2. Ordenar por mayor cantidad \n3. Regresar al menú principal");
+                            try {opcion = scanInt.nextInt();}
+                            catch(Exception e) {//En caso de que el usuario ingrese texto en lugar de un número 
+                                System.out.println("\n**ERROR** La decision ingresada debe ser un número.");
+                                scanInt.nextLine();
+                                continue;}
+                            if (opcion>0 && opcion<4) {
+                                validar_opcion = false;}
+                            else {
+                                System.out.println("\n**ERROR** El número ingresado no se encuentra entre las opciones disponibles.");}}
 
                         if (opcion == 1) {
                             ordenarPorFechaCaducidad();
                         } else if (opcion == 2) {
                             ordenarPorMayorCantidad();
-                        } 
+                        } else if (opcion == 3) {
+                            break;}
                         // Volver a mostrar el inventario ordenado
                         ver_inventario(restaurante_id, gestionBD);
-                        break;
-                    }
+                        break;}
 
                     case 5:{//Cerrar sesión
                         System.out.println("\t\t     ┌─────────────────────────────┐\n\t\t     " + "│ Sesión cerrada exitosamente │\n\t\t     └─────────────────────────────┘");
@@ -168,7 +178,7 @@ public class Mesero extends ITipoUsuario {
                         break;}
 					
 					default:{//Opción no disponible (programación defensiva)
-						System.out.println("\n**ERROR**\nEl numero ingresado no se encuentra entre las opciones disponibles.");}}}
+						System.out.println("\n**ERROR**\nEl número ingresado no se encuentra entre las opciones disponibles.");}}}
     }
 
     public void hacer_reserva(int usuario_id, GestionBD gestionBD, TimeSimulator simulator, Scanner scanString, Scanner scanInt){
@@ -187,11 +197,11 @@ public class Mesero extends ITipoUsuario {
         //Solicitar al usuario el número de personas para la reserva
         boolean seleccion_num_personas = true;
         while(seleccion_num_personas) {
-            System.out.println("\nIngrese el numero de personas para la reserva: ");
+            System.out.println("\nIngrese el número de personas para la reserva: ");
             try {
                 num_personas = scanInt.nextInt();} 
             catch(Exception e) {
-                System.out.println("\n**ERROR** La decision ingresada debe ser un numero.");
+                System.out.println("\n**ERROR** La decision ingresada debe ser un número.");
                 scanInt.nextLine();
                 continue;}
             
@@ -199,7 +209,7 @@ public class Mesero extends ITipoUsuario {
                 seleccion_num_personas = false;} 
             
             else {
-                System.out.println("\n**ERROR** El numero de personas debe ser mayor a 0.");}}
+                System.out.println("\n**ERROR** El número de personas debe ser mayor a 0.");}}
         
         //Solicitar al usuario la fecha de la reserva
         boolean seleccion_fecha = true;
@@ -289,13 +299,13 @@ public class Mesero extends ITipoUsuario {
         boolean terminar_pedido = false;
         while(terminar_pedido==false){
             System.out.println("\n╔════════════════════════════════════════════════╗\n║                MENU CAMPUS PIZZA               ║\n╠════════════════════════════════════════════════╣\n║ 1. Pizza hawaiana...................... Q70.00 ║\n║ 2. Pizza de pepperoni.................. Q65.00 ║\n║ 3. Pizza de queso...................... Q65.00 ║\n║ 4. Pizza de vegetales.................. Q70.00 ║\n║ 5. Pizza margarita..................... Q70.00 ║\n║ 6. Pizza de jamón...................... Q65.00 ║\n╠════════════════════════════════════════════════╣\n║ 7. Agua pura.......................... Q15.00  ║\n║ 8. Coca-cola.......................... Q10.00  ║\n║ 9. Coca-cola zero..................... Q10.00  ║\n╚════════════════════════════════════════════════╝");
-            System.out.println("\nIngrese el numero correspondiente al plato que desea agregar al pedido de la reserva (o '0' para dar por finalizado el pedido): ");
+            System.out.println("\nIngrese el número correspondiente al plato que desea agregar al pedido de la reserva (o '0' para dar por finalizado el pedido): ");
 
             int decision_pedido = -1;
             try {decision_pedido = scanInt.nextInt();}
 
             catch(Exception e) {//En caso de que el usuario ingrese texto en lugar de un número 
-                System.out.println("\n**ERROR** La decision ingresada debe ser un numero.");
+                System.out.println("\n**ERROR** La decision ingresada debe ser un número.");
                 scanInt.nextLine();
                 continue;}
             
@@ -313,7 +323,7 @@ public class Mesero extends ITipoUsuario {
                     try {cantidad_pedido = scanInt.nextInt();}
 
                     catch(Exception e) {//En caso de que el usuario ingrese texto en lugar de un número 
-                        System.out.println("\n**ERROR** La cantidad ingresada debe ser un numero.");
+                        System.out.println("\n**ERROR** La cantidad ingresada debe ser un número.");
                         scanInt.nextLine();
                         continue;}
                     
@@ -325,7 +335,7 @@ public class Mesero extends ITipoUsuario {
                     else {
                         System.out.println("\n**ERROR** La cantidad ingresada debe ser mayor a 0.");}}}
             else {
-                System.out.println("\n**ERROR** El numero ingresado no se encuentra entre las opciones disponibles.");}}
+                System.out.println("\n**ERROR** El número ingresado no se encuentra entre las opciones disponibles.");}}
 
             Map<String, Integer> contadorPlatos = new LinkedHashMap<>();
 
@@ -464,9 +474,9 @@ public class Mesero extends ITipoUsuario {
         }
     
         // Mostrar inventario
-        System.out.println("\n╔═══════════════════════════════════════════════╗");
-        System.out.printf("%-30s %-10s %-15s%n", "Nombre Insumo", "Cantidad", "Fecha Caducidad");
-        System.out.println("╚═══════════════════════════════════════════════╝");
+        System.out.println();
+        System.out.printf("%-30s %-10s %-15s%n", "Nombre del insumo", "Cantidad", "Fecha de caducidad");
+        System.out.println("--------------------------------------------------------------");
         for (int i = 0; i < nombresInsumos.size(); i++) {
             System.out.printf("%-30s %-10d %-15s%n", nombresInsumos.get(i), cantidades.get(i), fechasCaducidad.get(i));
         }

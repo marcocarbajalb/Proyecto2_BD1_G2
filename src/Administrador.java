@@ -18,6 +18,7 @@ public class Administrador extends ITipoUsuario {
     private String username;
     private String password;
     public final String rol = "administrador";
+        
         // variables locales para poder trabajar con lo del inventario...
         private List<String> nombresInsumos = new ArrayList<>();
         private List<Integer> cantidades = new ArrayList<>();
@@ -86,13 +87,13 @@ public class Administrador extends ITipoUsuario {
                 System.out.println("\n\t       ╔══════════════════════════════════════════╗\n\t       ║ Fecha y hora actual: " + simulator.getFechaFormateada() + " ║\n\t       ╚══════════════════════════════════════════╝");
                 
                 System.out.println("\n[ADMINISTRADOR]\nBienvenido/a, "+ usuario_activo.getNombres() + " " + usuario_activo.getApellidos());
-		        System.out.println("\nIngrese el numero correspondiente a la opcion que desea realizar:\n1. Desplegar auditoría de cambios\n2. Generar reportes\n3. Ver personal\n4. Gestionar inventario\n5. Ver disponibilidad de mesas\n6. Consultar reservas y pedidos\n7. Ver historial de clientes\n8. Cerrar sesión");
+		        System.out.println("\nIngrese el número correspondiente a la opción que desea realizar:\n1. Desplegar auditoría de cambios\n2. Generar reportes\n3. Ver personal\n4. Gestionar inventario\n5. Ver disponibilidad de mesas\n6. Consultar reservas y pedidos\n7. Ver historial de clientes\n8. Cerrar sesión");
 
 				int decision_secundaria = 0;
 				try {decision_secundaria = scanInt.nextInt();}
 
 				catch(Exception e) {//En caso de que el usuario ingrese texto en lugar de un número 
-					System.out.println("\n**ERROR** La decision ingresada debe ser un numero.");
+					System.out.println("\n**ERROR** La decision ingresada debe ser un número.");
 					scanInt.nextLine();
 					continue;}
 				
@@ -112,7 +113,7 @@ public class Administrador extends ITipoUsuario {
                                 try {cantidad_cambios = scanInt.nextInt();}
 
                                 catch(Exception e) {//En caso de que el usuario ingrese texto en lugar de un número 
-                                    System.out.println("\n**ERROR** La cantidad ingresada debe ser un numero.");
+                                    System.out.println("\n**ERROR** La cantidad ingresada debe ser un número.");
                                     scanInt.nextLine();
                                     continue;}
                                 
@@ -136,14 +137,14 @@ public class Administrador extends ITipoUsuario {
                         int decision_restaurante = 0;
                         boolean seleccion_restaurante = true;
                         while(seleccion_restaurante) {
-                            System.out.println("\nIngrese el numero de la sucursal de la que desea ver el personal: ");
+                            System.out.println("\nIngrese el número de la sucursal de la que desea ver el personal: ");
                             for(int i=0;i<restaurantes.length;i++) {
                                 System.out.println((i+1) + ". " + restaurantes[i]);}
                             
                             try {
                                 decision_restaurante = scanInt.nextInt();} 
                             catch(Exception e) {
-                                System.out.println("\n**ERROR** La decision ingresada debe ser un numero.");
+                                System.out.println("\n**ERROR** La decision ingresada debe ser un número.");
                                 scanInt.nextLine();
                                 continue;}
                             
@@ -151,7 +152,7 @@ public class Administrador extends ITipoUsuario {
                                 seleccion_restaurante = false;} 
                             
                             else {
-                                System.out.println("\n**ERROR** El numero ingresado no se encuentra entre las opciones disponibles.");}}
+                                System.out.println("\n**ERROR** El número ingresado no se encuentra entre las opciones disponibles.");}}
                             
                         restaurante_id = decision_restaurante;
                         List<String> gerentes = gestionBD.obtener_gerentes(restaurante_id);
@@ -194,40 +195,49 @@ public class Administrador extends ITipoUsuario {
                         }
                     
                         restaurante_id = decision_restaurante;
-                        System.out.println("\n\t\t[Sucursal: " + restaurantes[restaurante_id - 1] + "]");
-                    
-                        // Opciones de gestión de inventario
-                        System.out.println("1. Mostrar inventario");
-                        System.out.println("2. Cambiar cantidad de insumos");
-                        System.out.println("3. Observar inventario en orden de cantidad");
-                        System.out.println("4. Observar inventario en orden de caducidad");
-                    
-                        int opcion = scanInt.nextInt();
-                        switch (opcion) {
-                            case 1:
-                                ver_inventario(restaurante_id, gestionBD);
-                                break;
-                            case 2:
-                                System.out.println("Ingrese el nombre del insumo:");
-                                String nombreInsumo = scanString.nextLine().trim();
-                                System.out.println("Ingrese la nueva cantidad:");
-                                int nuevaCantidad = scanInt.nextInt();
-                                cambiarCantidadInsumo(restaurante_id, nombreInsumo, nuevaCantidad, gestionBD);
-                                break;
-                            case 3:
-                                ordenarPorMayorCantidad();
-                                ver_inventario(restaurante_id, gestionBD); // Mostrar el inventario reordenado
-                                break;
-                            case 4:
-                                ordenarPorFechaCaducidad();
-                                ver_inventario(restaurante_id, gestionBD); // Mostrar el inventario reordenado
-                                break;
-                            default:
-                                System.out.println("Opción no válida.");
-                                break;
-                        }
-                        break;
-                    }
+                        
+                        boolean validar_menu_inventario = true;
+                        while(validar_menu_inventario) {
+                        
+                            System.out.println("\n\t\t[Sucursal: " + restaurantes[restaurante_id - 1] + "]");
+                        
+                            // Opciones de gestión de inventario
+                            System.out.println("Ingrese el número correspondiente a la opción que desea realizar:\n1. Mostrar inventario\n2. Cambiar cantidad de insumos\n3. Observar inventario en orden de cantidad\n4. Observar inventario en orden de caducidad \n5. Regresar al menú principal");
+
+                            int opcion = 0;
+                            try {opcion = scanInt.nextInt();}
+                            
+                            catch(Exception e) {//En caso de que el usuario ingrese texto en lugar de un número 
+                                System.out.println("\n**ERROR** La decision ingresada debe ser un número.");
+                                scanInt.nextLine();
+                                continue;}
+                            
+                            switch (opcion) {
+                                case 1:
+                                    ver_inventario(restaurante_id, gestionBD);
+                                    break;
+                                case 2:
+                                    System.out.println("Ingrese el nombre del insumo:");
+                                    String nombreInsumo = scanString.nextLine().trim();
+                                    System.out.println("Ingrese la nueva cantidad:");
+                                    int nuevaCantidad = scanInt.nextInt();
+                                    cambiarCantidadInsumo(restaurante_id, nombreInsumo, nuevaCantidad, gestionBD);
+                                    break;
+                                case 3:
+                                    ordenarPorMayorCantidad();
+                                    ver_inventario(restaurante_id, gestionBD); // Mostrar el inventario reordenado
+                                    break;
+                                case 4:
+                                    ordenarPorFechaCaducidad();
+                                    ver_inventario(restaurante_id, gestionBD); // Mostrar el inventario reordenado
+                                    break;
+                                case 5:
+                                    validar_menu_inventario = false;
+                                    break;
+                                default:
+                                    System.out.println("\n**ERROR** El número ingresado no se encuentra entre las opciones disponibles.");
+                                    break;}}
+                        break;}
                     
                     case 5:{//Ver disponibilidad de mesas
                         System.out.println("\n╠══════════════════════VER DISPONIBILIDAD DE MESAS══════════════════════╣");
@@ -237,14 +247,14 @@ public class Administrador extends ITipoUsuario {
                         int decision_restaurante = 0;
                         boolean seleccion_restaurante = true;
                         while(seleccion_restaurante) {
-                            System.out.println("\nIngrese el numero de la sucursal de la que desea ver la disponibilidad de mesas: ");
+                            System.out.println("\nIngrese el número de la sucursal de la que desea ver la disponibilidad de mesas: ");
                             for(int i=0;i<restaurantes.length;i++) {
                                 System.out.println((i+1) + ". " + restaurantes[i]);}
                             
                             try {
                                 decision_restaurante = scanInt.nextInt();} 
                             catch(Exception e) {
-                                System.out.println("\n**ERROR** La decision ingresada debe ser un numero.");
+                                System.out.println("\n**ERROR** La decision ingresada debe ser un número.");
                                 scanInt.nextLine();
                                 continue;}
                             
@@ -252,7 +262,7 @@ public class Administrador extends ITipoUsuario {
                                 seleccion_restaurante = false;} 
                             
                             else {
-                                System.out.println("\n**ERROR** El numero ingresado no se encuentra entre las opciones disponibles.");}}
+                                System.out.println("\n**ERROR** El número ingresado no se encuentra entre las opciones disponibles.");}}
                             
                         restaurante_id = decision_restaurante;
                         mostrarDistribucionMesas(restaurante_id, gestionBD, simulator);
@@ -266,14 +276,14 @@ public class Administrador extends ITipoUsuario {
                         int decision_restaurante = 0;
                         boolean seleccion_restaurante = true;
                         while(seleccion_restaurante) {
-                            System.out.println("\nIngrese el numero de la sucursal de la que desea consultar las reservas y pedidos: ");
+                            System.out.println("\nIngrese el número de la sucursal de la que desea consultar las reservas y pedidos: ");
                             for(int i=0;i<restaurantes.length;i++) {
                                 System.out.println((i+1) + ". " + restaurantes[i]);}
                             
                             try {
                                 decision_restaurante = scanInt.nextInt();} 
                             catch(Exception e) {
-                                System.out.println("\n**ERROR** La decision ingresada debe ser un numero.");
+                                System.out.println("\n**ERROR** La decision ingresada debe ser un número.");
                                 scanInt.nextLine();
                                 continue;}
                             
@@ -281,7 +291,7 @@ public class Administrador extends ITipoUsuario {
                                 seleccion_restaurante = false;} 
                             
                             else {
-                                System.out.println("\n**ERROR** El numero ingresado no se encuentra entre las opciones disponibles.");}}
+                                System.out.println("\n**ERROR** El número ingresado no se encuentra entre las opciones disponibles.");}}
                             
                         restaurante_id = decision_restaurante;
                         System.out.println("\n\t\t[Sucursal: " + restaurantes[restaurante_id-1] + "]\n");
@@ -296,14 +306,14 @@ public class Administrador extends ITipoUsuario {
                         int decision_restaurante = 0;
                         boolean seleccion_restaurante = true;
                         while(seleccion_restaurante) {
-                            System.out.println("\nIngrese el numero de la sucursal de la que desea ver el historial de clientes: ");
+                            System.out.println("\nIngrese el número de la sucursal de la que desea ver el historial de clientes: ");
                             for(int i=0;i<restaurantes.length;i++) {
                                 System.out.println((i+1) + ". " + restaurantes[i]);}
                             
                             try {
                                 decision_restaurante = scanInt.nextInt();} 
                             catch(Exception e) {
-                                System.out.println("\n**ERROR** La decision ingresada debe ser un numero.");
+                                System.out.println("\n**ERROR** La decision ingresada debe ser un número.");
                                 scanInt.nextLine();
                                 continue;}
                             
@@ -311,7 +321,7 @@ public class Administrador extends ITipoUsuario {
                                 seleccion_restaurante = false;} 
                             
                             else {
-                                System.out.println("\n**ERROR** El numero ingresado no se encuentra entre las opciones disponibles.");}}
+                                System.out.println("\n**ERROR** El número ingresado no se encuentra entre las opciones disponibles.");}}
                             
                         restaurante_id = decision_restaurante;
                         System.out.println("\n\t\t[Sucursal: " + restaurantes[restaurante_id-1] + "]\n");
@@ -324,7 +334,7 @@ public class Administrador extends ITipoUsuario {
                         break;}
 					
 					default:{//Opción no disponible (programación defensiva)
-						System.out.println("\n**ERROR**\nEl numero ingresado no se encuentra entre las opciones disponibles.");}}}
+						System.out.println("\n**ERROR**\nEl número ingresado no se encuentra entre las opciones disponibles.");}}}
 
                         
     }
@@ -332,13 +342,13 @@ public class Administrador extends ITipoUsuario {
     public void menuReportes(GestionBD gestionBD, Scanner scanString, Scanner scanInt) {
         boolean menu_reportes = true;
         while(menu_reportes) {
-            System.out.println("\nIngrese el numero correspondiente al reporte que sea visualizar:\n1. Top 10 de los platos más vendidos\n2. Top 10 de los clientes más frecuentes\n3. Top 5 de los clientes con mayores reservas y su preferencia de platos\n4. Reporte mensual de insumos a punto de terminarse o caducar\n5. Comportamiento de sucursales con mayor cantidad de reservas y ventas\n6. Regresar al menú principal");
+            System.out.println("\nIngrese el número correspondiente al reporte que sea visualizar:\n1. Top 10 de los platos más vendidos\n2. Top 10 de los clientes más frecuentes\n3. Top 5 de los clientes con mayores reservas y su preferencia de platos\n4. Reporte mensual de insumos a punto de terminarse o caducar\n5. Comportamiento de sucursales con mayor cantidad de reservas y ventas\n6. Regresar al menú principal");
 
             int decision_reporte = 0;
             try {decision_reporte = scanInt.nextInt();}
 
             catch(Exception e) {//En caso de que el usuario ingrese texto en lugar de un número 
-                System.out.println("\n**ERROR** La decision ingresada debe ser un numero.");
+                System.out.println("\n**ERROR** La decision ingresada debe ser un número.");
                 scanInt.nextLine();
                 continue;}
             
@@ -407,7 +417,7 @@ public class Administrador extends ITipoUsuario {
                     break;}
                 
                 default:{//Opción no disponible (programación defensiva)
-                    System.out.println("\n**ERROR**\nEl numero ingresado no se encuentra entre las opciones disponibles.");}}}
+                    System.out.println("\n**ERROR**\nEl número ingresado no se encuentra entre las opciones disponibles.");}}}
     }
 
     public void consultar_reservas_personal(int restaurante_id, GestionBD gestionBD) {
@@ -512,9 +522,9 @@ public class Administrador extends ITipoUsuario {
             }
         
             // Mostrar inventario
-            System.out.println("\n╔═══════════════════════════════════════════════╗");
-            System.out.printf("%-30s %-10s %-15s%n", "Nombre Insumo", "Cantidad", "Fecha Caducidad");
-            System.out.println("╚═══════════════════════════════════════════════╝");
+            System.out.println();
+            System.out.printf("%-30s %-10s %-15s%n", "Nombre del insumo", "Cantidad", "Fecha de caducidad");
+            System.out.println("--------------------------------------------------------------");
             for (int i = 0; i < nombresInsumos.size(); i++) {
                 System.out.printf("%-30s %-10d %-15s%n", nombresInsumos.get(i), cantidades.get(i), fechasCaducidad.get(i));
             }

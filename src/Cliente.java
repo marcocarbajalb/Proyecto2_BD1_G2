@@ -94,13 +94,13 @@ public class Cliente extends ITipoUsuario {
                 System.out.println("\n\t       ╔══════════════════════════════════════════╗\n\t       ║ Fecha y hora actual: " + simulator.getFechaFormateada() + " ║\n\t       ╚══════════════════════════════════════════╝");
                 
                 System.out.println("\n[CLIENTE]\nBienvenido/a, "+ usuario_activo.getNombres() + " " + usuario_activo.getApellidos());
-		        System.out.println("\nIngrese el numero correspondiente a la opcion que desea realizar:\n1. Reservar en restaurante\n2. Consultar mis reservas y pedidos\n3. Dejar observaciones/comentarios \n4. Consultar mi historial de visitas\n5. Cerrar sesión");
+		        System.out.println("\nIngrese el número correspondiente a la opción que desea realizar:\n1. Reservar en restaurante\n2. Consultar mis reservas y pedidos\n3. Dejar observaciones/comentarios \n4. Consultar mi historial de visitas\n5. Cerrar sesión");
 
 				int decision_secundaria = 0;
 				try {decision_secundaria = scanInt.nextInt();}
 
 				catch(Exception e) {//En caso de que el usuario ingrese texto en lugar de un número 
-					System.out.println("\n**ERROR** La decision ingresada debe ser un numero.");
+					System.out.println("\n**ERROR** La decision ingresada debe ser un número.");
 					scanInt.nextLine();
 					continue;}
 				
@@ -135,7 +135,7 @@ public class Cliente extends ITipoUsuario {
 						break;}
 					
 					default:{//Opción no disponible (programación defensiva)
-						System.out.println("\n**ERROR**\nEl numero ingresado no se encuentra entre las opciones disponibles.");}}}
+						System.out.println("\n**ERROR**\nEl número ingresado no se encuentra entre las opciones disponibles.");}}}
     }
 
     public void hacer_reserva(int usuario_id, GestionBD gestionBD, TimeSimulator simulator, Scanner scanString, Scanner scanInt){
@@ -153,14 +153,14 @@ public class Cliente extends ITipoUsuario {
         int decision_restaurante = 0;
         boolean seleccion_restaurante = true;
         while(seleccion_restaurante) {
-            System.out.println("\nIngrese el numero correspondiente a la sucursal en la que desea reservar: ");
+            System.out.println("\nIngrese el número correspondiente a la sucursal en la que desea reservar: ");
             for(int i=0;i<restaurantes.length;i++) {
                 System.out.println((i+1) + ". " + restaurantes[i]);}
             
             try {
                 decision_restaurante = scanInt.nextInt();} 
             catch(Exception e) {
-                System.out.println("\n**ERROR** La decision ingresada debe ser un numero.");
+                System.out.println("\n**ERROR** La decision ingresada debe ser un número.");
                 scanInt.nextLine();
                 continue;}
             
@@ -168,18 +168,18 @@ public class Cliente extends ITipoUsuario {
                 seleccion_restaurante = false;} 
             
             else {
-                System.out.println("\n**ERROR** El numero ingresado no se encuentra entre las opciones disponibles.");}}
+                System.out.println("\n**ERROR** El número ingresado no se encuentra entre las opciones disponibles.");}}
             
         restaurante_id = decision_restaurante;
 
         //Solicitar al usuario el número de personas para la reserva
         boolean seleccion_num_personas = true;
         while(seleccion_num_personas) {
-            System.out.println("\nIngrese el numero de personas para la reserva: ");
+            System.out.println("\nIngrese el número de personas para la reserva: ");
             try {
                 num_personas = scanInt.nextInt();} 
             catch(Exception e) {
-                System.out.println("\n**ERROR** La decision ingresada debe ser un numero.");
+                System.out.println("\n**ERROR** La decision ingresada debe ser un número.");
                 scanInt.nextLine();
                 continue;}
             
@@ -187,7 +187,7 @@ public class Cliente extends ITipoUsuario {
                 seleccion_num_personas = false;} 
             
             else {
-                System.out.println("\n**ERROR** El numero de personas debe ser mayor a 0.");}}
+                System.out.println("\n**ERROR** El número de personas debe ser mayor a 0.");}}
         
         //Solicitar al usuario la fecha de la reserva
         boolean seleccion_fecha = true;
@@ -277,13 +277,13 @@ public class Cliente extends ITipoUsuario {
         boolean terminar_pedido = false;
         while(terminar_pedido==false){
             System.out.println("\n╔════════════════════════════════════════════════╗\n║                MENU CAMPUS PIZZA               ║\n╠════════════════════════════════════════════════╣\n║ 1. Pizza hawaiana...................... Q70.00 ║\n║ 2. Pizza de pepperoni.................. Q65.00 ║\n║ 3. Pizza de queso...................... Q65.00 ║\n║ 4. Pizza de vegetales.................. Q70.00 ║\n║ 5. Pizza margarita..................... Q70.00 ║\n║ 6. Pizza de jamón...................... Q65.00 ║\n╠════════════════════════════════════════════════╣\n║ 7. Agua pura.......................... Q15.00  ║\n║ 8. Coca-cola.......................... Q10.00  ║\n║ 9. Coca-cola zero..................... Q10.00  ║\n╚════════════════════════════════════════════════╝");
-            System.out.println("\nIngrese el numero correspondiente al plato que desea agregar al pedido de su reserva (o '0' para dar por finalizado el pedido): ");
+            System.out.println("\nIngrese el número correspondiente al plato que desea agregar al pedido de su reserva (o '0' para dar por finalizado el pedido): ");
 
             int decision_pedido = -1;
             try {decision_pedido = scanInt.nextInt();}
 
             catch(Exception e) {//En caso de que el usuario ingrese texto en lugar de un número 
-                System.out.println("\n**ERROR** La decision ingresada debe ser un numero.");
+                System.out.println("\n**ERROR** La decision ingresada debe ser un número.");
                 scanInt.nextLine();
                 continue;}
             
@@ -301,7 +301,7 @@ public class Cliente extends ITipoUsuario {
                     try {cantidad_pedido = scanInt.nextInt();}
 
                     catch(Exception e) {//En caso de que el usuario ingrese texto en lugar de un número 
-                        System.out.println("\n**ERROR** La cantidad ingresada debe ser un numero.");
+                        System.out.println("\n**ERROR** La cantidad ingresada debe ser un número.");
                         scanInt.nextLine();
                         continue;}
                     
@@ -313,7 +313,7 @@ public class Cliente extends ITipoUsuario {
                     else {
                         System.out.println("\n**ERROR** La cantidad ingresada debe ser mayor a 0.");}}}
             else {
-                System.out.println("\n**ERROR** El numero ingresado no se encuentra entre las opciones disponibles.");}}
+                System.out.println("\n**ERROR** El número ingresado no se encuentra entre las opciones disponibles.");}}
 
             Map<String, Integer> contadorPlatos = new LinkedHashMap<>();
 
@@ -382,7 +382,7 @@ public class Cliente extends ITipoUsuario {
         List<Integer> reservas_ids = gestionBD.obtenerReservasCliente(cliente_id);
         if(reservas_ids.size()>0) {
             int i;
-            System.out.println("\nIngrese el numero correspondiente a la reserva en la que desea dejar observaciones/comentarios sobre su experiencia: ");
+            System.out.println("\nIngrese el número correspondiente a la reserva en la que desea dejar observaciones/comentarios sobre su experiencia: ");
             for(i=0;i<reservas_ids.size();i++) {
                 System.out.println((i+1) + ". Reserva #" + reservas_ids.get(i));}
             System.out.println((i+1) + ". Regresar al menú principal");
@@ -390,7 +390,7 @@ public class Cliente extends ITipoUsuario {
             try {decision_reserva = scanInt.nextInt();}
 
             catch(Exception e) {//En caso de que el usuario ingrese texto en lugar de un número 
-                System.out.println("\n**ERROR** La decision ingresada debe ser un numero.");
+                System.out.println("\n**ERROR** La decision ingresada debe ser un número.");
                 scanInt.nextLine();
                 return;}
             
@@ -404,7 +404,7 @@ public class Cliente extends ITipoUsuario {
                 return;}
             
             else {
-                System.out.println("\n**ERROR** El numero ingresado no se encuentra entre las opciones disponibles.");}
+                System.out.println("\n**ERROR** El número ingresado no se encuentra entre las opciones disponibles.");}
         }
         else {
             System.out.println("\nOPCION NO DISPONIBLE. \nNo se han encontrado reservas asociadas a su cuenta.");}

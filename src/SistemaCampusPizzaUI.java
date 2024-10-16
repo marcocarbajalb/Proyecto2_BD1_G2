@@ -38,13 +38,13 @@ public class SistemaCampusPizzaUI {
                 //Menú que se le mostrará al usuario
                 System.out.println("\n\n░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░\n░░░░░░░░░░░░░░░░ BIENVENIDO/A AL SISTEMA DE CAMPUS PIZZA ░░░░░░░░░░░░░░░░\n░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░");
                 System.out.println("\n\t       ╔══════════════════════════════════════════╗\n\t       ║ Fecha y hora actual: " + simulator.getFechaFormateada() + " ║\n\t       ╚══════════════════════════════════════════╝");
-                System.out.println("\nIngrese el numero correspondiente a la opcion que desea realizar:\n1. Registrarse\n2. Iniciar sesión\n3. Salir del programa");
+                System.out.println("\nIngrese el número correspondiente a la opción que desea realizar:\n1. Registrarse\n2. Iniciar sesión\n3. Salir del programa");
                 
                 int decision_principal = 0;
                 try {decision_principal = scanInt.nextInt();}
 
                 catch(Exception e) {//En caso de que el usuario ingrese texto en lugar de un número 
-                    System.out.println("\n**ERROR** La decision ingresada debe ser un numero.");
+                    System.out.println("\n**ERROR** La decision ingresada debe ser un número.");
                     scanInt.nextLine();
                     continue;}
                     
@@ -76,7 +76,7 @@ public class SistemaCampusPizzaUI {
                         break;}
                     
                     default:{//Opción no disponible (programación defensiva)
-                        System.out.println("\n**ERROR**\nEl numero ingresado no se encuentra entre las opciones disponibles.");}
+                        System.out.println("\n**ERROR**\nEl número ingresado no se encuentra entre las opciones disponibles.");}
                 }
             }
         }
@@ -91,14 +91,14 @@ public class SistemaCampusPizzaUI {
 		int decision_perfil = 0;
 	    boolean seleccion_perfil = true;
 	    while(seleccion_perfil) {
-	        System.out.println("\nIngrese el numero correspondiente a su categoria de perfil: ");
+	        System.out.println("\nIngrese el número correspondiente a su categoria de perfil: ");
 	        for(int i=0;i<tipos_de_perfiles.length;i++) {
 	            System.out.println((i+1) + ". " + tipos_de_perfiles[i]);}
 	        
 	        try {
 				decision_perfil = scanInt.nextInt();} 
 	        catch(Exception e) {
-	            System.out.println("\n**ERROR** La decision ingresada debe ser un numero.");
+	            System.out.println("\n**ERROR** La decision ingresada debe ser un número.");
 	            scanInt.nextLine();
 	            continue;}
 	        
@@ -106,7 +106,7 @@ public class SistemaCampusPizzaUI {
 	            seleccion_perfil = false;} 
 	        
 	        else {
-	            System.out.println("\n**ERROR** El numero ingresado no se encuentra entre las opciones disponibles.");}}
+	            System.out.println("\n**ERROR** El número ingresado no se encuentra entre las opciones disponibles.");}}
 	    
         int tipo_perfil = decision_perfil;
 
@@ -130,14 +130,14 @@ public class SistemaCampusPizzaUI {
         if(tipo_perfil==2 || tipo_perfil==3) {
             boolean seleccion_restaurante = true;
             while(seleccion_restaurante) {
-                System.out.println("\nIngrese el numero correspondiente a la sucursal de Campus Pizza a la que pertenece: ");
+                System.out.println("\nIngrese el número correspondiente a la sucursal de Campus Pizza a la que pertenece: ");
                 for(int i=0;i<sucursales_restaurante.length;i++) {
                     System.out.println((i+1) + ". " + sucursales_restaurante[i]);}
                 
                 try {
                     decision_restaurante = scanInt.nextInt();} 
                 catch(Exception e) {
-                    System.out.println("\n**ERROR** La decision ingresada debe ser un numero.");
+                    System.out.println("\n**ERROR** La decision ingresada debe ser un número.");
                     scanInt.nextLine();
                     continue;}
                 
@@ -145,7 +145,7 @@ public class SistemaCampusPizzaUI {
                     seleccion_restaurante = false;} 
                 
                 else {
-                    System.out.println("\n**ERROR** El numero ingresado no se encuentra entre las opciones disponibles.");}}
+                    System.out.println("\n**ERROR** El número ingresado no se encuentra entre las opciones disponibles.");}}
             
             restaurante_id = decision_restaurante;}
 

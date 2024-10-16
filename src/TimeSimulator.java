@@ -69,14 +69,16 @@ public class TimeSimulator {
 
     // alerta para verificar los insumos con cantidades bajas... 
     private void verificarInsumosBajos() {
-        // Llamar a la función en GestionBD para obtener los insumos por debajo del 20%
-        List<List<Object>> insumosBajos = gestionBD.obtenerInsumosBajoPorcentaje(20);
+        
+        // Llamar a la función en GestionBD para obtener los insumos por debajo del 15%
+        List<List<Object>> insumosBajos = gestionBD.obtenerInsumosBajoPorcentaje(15);
         
         if (insumosBajos.isEmpty()) {
-            System.out.println("No hay insumos con menos del 20% de su capacidad.");
+            System.out.println("\n\t\tNo hay insumos con menos del 15% de su capacidad.");
         } else {
-            System.out.println("\n╠═════════════════════════════INSUMOS BAJOS═════════════════════════════╣");
-            System.out.printf("%-30s %-10s%n", "Nombre Insumo", "Cantidad Restante");
+            System.out.println("\n╠═════════════════════════¡ALERTA! INSUMOS BAJOS════════════════════════╣");
+            System.out.printf("%-30s %-10s%n", "Nombre del insumo", "Cantidad restante");
+            System.out.println("--------------------------------------------");
             for (List<Object> insumo : insumosBajos) {
                 String nombreInsumo = (String) insumo.get(0);
                 int cantidad = (int) insumo.get(1);
