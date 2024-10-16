@@ -306,19 +306,18 @@ public class Administrador extends ITipoUsuario {
                 
                 case 3:{//Top 5 de los clientes con mayores reservas y su preferencia de platos
                     System.out.println("\n├─TOP 5 DE LOS CLIENTES CON MAYORES RESERVAS Y SU PREFERENCIA DE PLATOS─┤");
-                    List<Object[]> topClientesPlatos = gestionBD.obtenerTop5ClientesMayoresReservas_PreferenciaPlatos();
+                    List<Object[]> topClientesPlatos = gestionBD.obtenerTop5ClientesConPreferencias();
 
                     // A verificar si tenemos elementos en la lista
                     if (!topClientesPlatos.isEmpty()) {
                         int contador = 1;
                         for (Object[] cliente : topClientesPlatos) {
-                            System.out.printf("%d. %s % s (ID: %d) %d %s\n",
+                            System.out.printf("%d %s %s (ID: %d) %s\n",
                                                 contador,
                                                 cliente[1], // su nombre
                                                 cliente[2], // apellido
                                                 cliente[0], // id
-                                                cliente[3],//la cantidad 
-                                                cliente[4]); //plato fav
+                                                cliente[3]); //plato fav
                             contador++;                        
                         }
                     } else {
