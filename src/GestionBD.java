@@ -731,11 +731,14 @@ public class GestionBD {
     /*
      * 
      * 
+     * 
      * MÉTODOS PARA OBTENER LOS QUERIES DEL REPORTE FINAL
+     * 
      * 
      * 
      */
 
+     //2. Top 10 clientes más Frecuentes
      //2. Top 10 clientes más Frecuentes
      //2. Top 10 clientes más Frecuentes
      public List<Object[]> obtenerTop10ClientesFrecuentes() {
@@ -853,6 +856,45 @@ public void actualizarCantidadInsumo(int restauranteId, String nombreInsumo, int
     }
 }
 
+    // Método para obtener Top 5 de Clientes con Mayores Reservas y su Preferencia de Platos
+    public List<Object[]> obtenerTop5ClientesConPreferencias() {
+        List<Object[]> topClientesPlatos = new ArrayList<>();
+        String sql = "WITH RankedDishes AS ( " +
+                "  SELECT u.usuario_id, p.nombre_plato, COUNT(*) AS plato_count, " +
+                "         DENSE_RANK() OVER (PARTITION BY u.usuario_id ORDER BY COUNT(*) DESC) AS rnk " +
+                "  FROM usuario_reserva ur " +
+                "  JOIN usuarios u ON ur.usuario_id = u.usuario_id " +
+                "  JOIN pedidos pd ON ur.reserva_id = pd.reserva_id " +
+                "  JOIN platos p ON pd.plato_id = p.plato_id " +
+                "  GROUP BY u.usuario_id, p.nombre_plato " +
+                ") " +
+                "SELECT u.usuario_id, u.nombres, u.apellidos, STRING_AGG(rd.nombre_plato, ', ') AS platos_favoritos " +
+                "FROM usuarios u " +
+                "JOIN RankedDishes rd ON u.usuario_id = rd.usuario_id " +
+                "WHERE rd.rnk = 1 " +
+                "GROUP BY u.usuario_id, u.username " +
+                "ORDER BY (SELECT COUNT(*) FROM usuario_reserva ur2 WHERE ur2.usuario_id = u.usuario_id) DESC " +
+                "LIMIT 5;";
+    
+        try (PreparedStatement statement = conexion.prepareStatement(sql)) {
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                Object[] cliente = new Object[4]; // Con 4 index, yeah
+                cliente[0] = resultSet.getInt("usuario_id");
+                cliente[1] = resultSet.getString("nombres");
+                cliente[2] = resultSet.getString("apellidos");
+                 // Formateamos la cadena de platos favoritos
+                String platosFavoritos = resultSet.getString("platos_favoritos");
+                String salidaPlatos = String.format("Platos favoritos: %s", platosFavoritos);
+
+                cliente[3] = salidaPlatos;
+                topClientesPlatos.add(cliente);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return topClientesPlatos;
+    }
     // Método para obtener Top 5 de Clientes con Mayores Reservas y su Preferencia de Platos
     public List<Object[]> obtenerTop5ClientesConPreferencias() {
         List<Object[]> topClientesPlatos = new ArrayList<>();
