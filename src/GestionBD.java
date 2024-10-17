@@ -1002,10 +1002,7 @@ public void actualizar_insumo(int restaurante_id, int insumo_id, int nuevaCantid
                 cliente.setUsuario_id(resultSet.getInt("usuario_id"));
                 cliente.setNombres(resultSet.getString("nombres"));
                 cliente.setApellidos(resultSet.getString("apellidos"));
-                 // Formateamos la cadena de platos favoritos
-                String platosFavoritos = resultSet.getString("platos_favoritos");
-                String salidaPlatos = String.format("Platos favoritos: %s", platosFavoritos);
-                cliente.setPlatosFavoritos(salidaPlatos);
+                cliente.setPlatosFavoritos(resultSet.getString("platos_favoritos"));
                 topClientesPlatos.add(cliente);
             }
         } catch (SQLException e) {
