@@ -727,22 +727,9 @@ public class GestionBD {
             System.out.println("Error al desplegar la auditoría de cambios: " + e.getMessage());
         }
     }
-
-    /*
-     * 
-     * 
-     * 
-     * MÉTODOS PARA OBTENER LOS QUERIES DEL REPORTE FINAL
-     * 
-     * 
-     * 
-     */
-
-     //2. Top 10 clientes más Frecuentes
-     //2. Top 10 clientes más Frecuentes
-     //2. Top 10 clientes más Frecuentes
-     public List<Object[]> obtenerTop10ClientesFrecuentes() {
-        List<Object[]> topClientes = new ArrayList<>();
+    
+     public List<Cliente> obtenerTop10ClientesFrecuentes() {
+        List<Cliente> topClientes = new ArrayList<>();
         String sql = "SELECT u.usuario_id as id, u.nombres, u.apellidos, COUNT(ur.reserva_id) AS frecuencia " +
                     "FROM usuario_reserva ur " +
                     "JOIN usuarios u ON ur.usuario_id = u.usuario_id " +
@@ -754,11 +741,11 @@ public class GestionBD {
         try (PreparedStatement statement = conexion.prepareStatement(sql)) {
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
-                Object[] cliente = new Object[4]; //con 4 posiciones de index
-                cliente[0] = resultSet.getInt("id");
-                cliente[1] = resultSet.getString("nombres");
-                cliente[2] = resultSet.getString("apellidos");
-                cliente[3] = resultSet.getInt("frecuencia");
+                Cliente cliente = new Cliente();
+                cliente.setUsuario_id(resultSet.getInt("id"));
+                cliente.setNombres(resultSet.getString("nombres"));
+                cliente.setApellidos(resultSet.getString("apellidos"));
+                cliente.setFrecuencia(resultSet.getInt("frecuencia"));
                 topClientes.add(cliente);
             }
         } catch (SQLException e) {
@@ -857,8 +844,8 @@ public void actualizarCantidadInsumo(int restauranteId, String nombreInsumo, int
 }
 
     // Método para obtener Top 5 de Clientes con Mayores Reservas y su Preferencia de Platos
-    public List<Object[]> obtenerTop5ClientesConPreferencias() {
-        List<Object[]> topClientesPlatos = new ArrayList<>();
+    public List<Cliente> obtenerTop5ClientesConPreferencias() {
+        List<Cliente> topClientesPlatos = new ArrayList<>();
         String sql = "WITH RankedDishes AS ( " +
                 "  SELECT u.usuario_id, p.nombre_plato, COUNT(*) AS plato_count, " +
                 "         DENSE_RANK() OVER (PARTITION BY u.usuario_id ORDER BY COUNT(*) DESC) AS rnk " +
@@ -879,15 +866,14 @@ public void actualizarCantidadInsumo(int restauranteId, String nombreInsumo, int
         try (PreparedStatement statement = conexion.prepareStatement(sql)) {
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
-                Object[] cliente = new Object[4]; // Con 4 index, yeah
-                cliente[0] = resultSet.getInt("usuario_id");
-                cliente[1] = resultSet.getString("nombres");
-                cliente[2] = resultSet.getString("apellidos");
+                Cliente cliente = new Cliente();
+                cliente.setUsuario_id(resultSet.getInt("usuario_id"));
+                cliente.setNombres(resultSet.getString("nombres"));
+                cliente.setApellidos(resultSet.getString("apellidos"));
                  // Formateamos la cadena de platos favoritos
                 String platosFavoritos = resultSet.getString("platos_favoritos");
                 String salidaPlatos = String.format("Platos favoritos: %s", platosFavoritos);
-
-                cliente[3] = salidaPlatos;
+                cliente.setPlatosFavoritos(salidaPlatos);
                 topClientesPlatos.add(cliente);
             }
         } catch (SQLException e) {
@@ -895,8 +881,95 @@ public void actualizarCantidadInsumo(int restauranteId, String nombreInsumo, int
         }
         return topClientesPlatos;
     }
+
+    public List<Object[]> platos_mas_vendidos() {
+        
+        List<Object[]> platos = new ArrayList<>();
+
+        String sql = "SELECT p.nombre_plato, COUNT(*) AS cantidad_vendida " +
+                     "FROM pedidos pd " +
+                     "JOIN platos p ON pd.plato_id = p.plato_id " +
+                     "GROUP BY p.nombre_plato " +
+                     "ORDER BY cantidad_vendida DESC " +
+                     "LIMIT 10";
+
+        try (PreparedStatement statement = conexion.prepareStatement(sql)) {
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                Object[] plato = new Object[2];
+                plato[0] = rs.getString("nombre_plato");
+                plato[1] = rs.getInt("cantidad_vendida");
+                platos.add(plato);}
+        } catch (SQLException e) {
+            System.out.println("Error al obtener los platos más vendidos: " + e.getMessage());
+        }
+
+        return platos;
+    }
+
+    public List<Object[]> reporte_insumos(String fecha_actual, String fecha_limite) {
+    
+        String sql = "SELECT r.nombre_restaurante, i.nombre AS nombre_insumo, inv.cantidad, inv.fecha_caducidad " +
+                     "FROM inventario inv " +
+                     "JOIN restaurante r ON inv.restaurante_id = r.restaurante_id " +
+                     "JOIN insumos i ON inv.insumo_id = i.insumo_id " +
+                     "WHERE inv.cantidad < 15 OR inv.fecha_caducidad BETWEEN ? AND ? " +
+                     "ORDER BY inv.fecha_caducidad ASC, inv.cantidad ASC";
+        
+        List<Object[]> reporte = new ArrayList<>();
+
+        try (PreparedStatement statement = conexion.prepareStatement(sql)) {
+            
+            LocalDate localDateActual = LocalDate.parse(fecha_actual.subSequence(0, 10));
+            Date sqlDateActual = Date.valueOf(localDateActual);
+
+            LocalDate localDateLimite = LocalDate.parse(fecha_limite.subSequence(0, 10));
+            Date sqlDateLimite = Date.valueOf(localDateLimite);
+            
+            statement.setDate(1, sqlDateActual);
+            statement.setDate(2, sqlDateLimite);
+
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                Object[] insumo = new Object[4];
+                insumo[0] = rs.getString("nombre_restaurante");
+                insumo[1] = rs.getString("nombre_insumo");
+                insumo[2] = rs.getInt("cantidad");
+                insumo[3] = rs.getDate("fecha_caducidad");
+                reporte.add(insumo);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al obtener el reporte de insumos: " + e.getMessage());
+        }
+        
+        return reporte;}
+
+    public List<Object[]> comportamiento_sucursales() {
+       
+        String sql = "SELECT r.nombre_restaurante, " +
+            "COUNT(DISTINCT reserva.reserva_id) AS total_reservas, " +
+            "COALESCE(SUM(platos.precio), 0) AS total_ventas " +
+            "FROM restaurante r " +
+            "LEFT JOIN reserva ON r.restaurante_id = reserva.restaurante_id " +
+            "LEFT JOIN pedidos ON reserva.reserva_id = pedidos.reserva_id " +
+            "LEFT JOIN platos ON pedidos.plato_id = platos.plato_id " +
+            "GROUP BY r.nombre_restaurante " +
+            "ORDER BY total_reservas DESC, total_ventas DESC;";
+
+        List<Object[]> reporte = new ArrayList<>();
+        try (PreparedStatement statement = conexion.prepareStatement(sql)) {
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                Object[] sucursal = new Object[3];
+                sucursal[0] = rs.getString("nombre_restaurante");
+                sucursal[1] = rs.getInt("total_reservas");
+                sucursal[2] = rs.getDouble("total_ventas");
+                reporte.add(sucursal);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al obtener el comportamiento de las sucursales: " + e.getMessage());
+        }
+
+        return reporte;}
     
 }
-
-    
-    

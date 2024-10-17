@@ -82,7 +82,6 @@ public class SistemaCampusPizzaUI {
         }
     }
 
-    
     public static void registrarUsuario(GestionBD gestionBD, Scanner scanString, Scanner scanInt) {
 		
 		//Tipos de usuarios disponibles

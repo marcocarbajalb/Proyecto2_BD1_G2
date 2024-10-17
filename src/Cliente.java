@@ -19,7 +19,8 @@ public class Cliente extends ITipoUsuario {
     private String username;
     private String password;
     public final String rol = "cliente";
-    private int frecuencia; // Para reporte ii.
+    private String platos_favoritos;
+    private int frecuencia;
 
     @Override
     public void setUsuario_id(int usuario_id) {
@@ -75,9 +76,15 @@ public class Cliente extends ITipoUsuario {
     public String getRol() {
         return rol;
     }
-
-    // Métodos para la frecuencia
    
+    public void setPlatosFavoritos(String platos_favoritos) {
+        this.platos_favoritos = platos_favoritos;
+    }
+
+    public String getPlatosFavoritos() {
+        return platos_favoritos;
+    }
+
     public void setFrecuencia(int frecuencia) {
         this.frecuencia = frecuencia;
     }

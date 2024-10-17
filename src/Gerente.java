@@ -143,11 +143,10 @@ public class Gerente extends ITipoUsuario {
                         break;}
                     
                     case 4:{//Gestionar inventario
-                        System.out.println("\n╠══════════════════════════GESTIONAR INVENTARIO═════════════════════════╣");
                         
                         boolean validar_menu_inventario = true;
                         while(validar_menu_inventario) {
-                        
+                            System.out.println("\n╠══════════════════════════GESTIONAR INVENTARIO═════════════════════════╣");
                             System.out.println("\nIngrese el número correspondiente a la opción que desea realizar:\n1. Mostrar inventario\n2. Cambiar cantidad de insumos\n3. Observar inventario en orden de cantidad\n4. Observar inventario en orden de caducidad\n5. Regresar al menú principal");
                                 
                             int opcion = 0;

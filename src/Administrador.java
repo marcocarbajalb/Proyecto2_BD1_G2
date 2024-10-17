@@ -125,8 +125,7 @@ public class Administrador extends ITipoUsuario {
                         break;}
 
                     case 2:{//Generar reportes
-                        System.out.println("\n╠════════════════════════════GENERAR REPORTES═══════════════════════════╣");
-                        menuReportes(gestionBD, scanString, scanInt);
+                        menuReportes(gestionBD, scanString, scanInt, simulator);
                         break;}
                     
                     case 3:{//Ver personal
@@ -339,9 +338,10 @@ public class Administrador extends ITipoUsuario {
                         
     }
 
-    public void menuReportes(GestionBD gestionBD, Scanner scanString, Scanner scanInt) {
+    public void menuReportes(GestionBD gestionBD, Scanner scanString, Scanner scanInt, TimeSimulator simulator) {
         boolean menu_reportes = true;
         while(menu_reportes) {
+            System.out.println("\n╠════════════════════════════GENERAR REPORTES═══════════════════════════╣");
             System.out.println("\nIngrese el número correspondiente al reporte que sea visualizar:\n1. Top 10 de los platos más vendidos\n2. Top 10 de los clientes más frecuentes\n3. Top 5 de los clientes con mayores reservas y su preferencia de platos\n4. Reporte mensual de insumos a punto de terminarse o caducar\n5. Comportamiento de sucursales con mayor cantidad de reservas y ventas\n6. Regresar al menú principal");
 
             int decision_reporte = 0;
@@ -355,61 +355,91 @@ public class Administrador extends ITipoUsuario {
             switch(decision_reporte) {
                 case 1:{//Top 10 de los platos más vendidos
                     System.out.println("\n├───────────────────TOP 10 DE LOS PLATOS MAS VENDIDOS───────────────────┤");
+                    List<Object[]> topPlatos = gestionBD.platos_mas_vendidos();
 
+                    if(topPlatos.size()>0){
+                        int contador = 1;
+                        for(Object[] plato : topPlatos) {
+                            System.out.printf("%d. %s - Ventas: %d\n",
+                                              contador,
+                                              plato[0], // nombre del plato
+                                              plato[1]); // cantidad de ventas
+                            contador++;}}
+                    else {
+                        System.out.println("\nREPORTE NO DISPONIBLE. \nTodavía no se cuenta con información de ventas de platos.");}
+                    
                     break;}
 
                     case 2: {//Top 10 de los clientes más frecuentes
                         System.out.println("\n├─────────────────TOP 10 DE LOS CLIENTES MAS FRECUENTES─────────────────┤");
-                        List<Object[]> topClientes = gestionBD.obtenerTop10ClientesFrecuentes();
+                        List<Cliente> topClientes = gestionBD.obtenerTop10ClientesFrecuentes();
                     
                         // Verifica si la lista tiene elementos
                         if (!topClientes.isEmpty()) {
                             int contador = 1;
-                            for (Object[] cliente : topClientes) {
+                            for (Cliente cliente : topClientes) {
                                 System.out.printf("%d. %s %s (ID: %d) - Reservas: %d\n",
                                                     contador,
-                                                    cliente[1], // su nombre
-                                                    cliente[2], // apellido
-                                                    cliente[0], // id
-                                                    cliente[3]); //la cantidad de reservas lol
+                                                    cliente.getNombres(), // su nombre
+                                                    cliente.getApellidos(), // apellido
+                                                    cliente.getUsuario_id(), // id
+                                                    cliente.getFrecuencia()); //la cantidad de reservas
                                 contador++; // se va aumentando con cada iteración
                             }
                         } else {
-                            System.out.println("No se encontraron clientes frecuentes porque aun no hay información de reserva.");
+                            System.out.println("\nREPORTE NO DISPONIBLE. \nTodavía no se cuenta con información de reservas de clientes.");
                         }
                         break;
                     }
                 
                 case 3:{//Top 5 de los clientes con mayores reservas y su preferencia de platos
                     System.out.println("\n├─TOP 5 DE LOS CLIENTES CON MAYORES RESERVAS Y SU PREFERENCIA DE PLATOS─┤");
-                    List<Object[]> topClientesPlatos = gestionBD.obtenerTop5ClientesConPreferencias();
+                    List<Cliente> topClientesPlatos = gestionBD.obtenerTop5ClientesConPreferencias();
 
                     // A verificar si tenemos elementos en la lista
                     if (!topClientesPlatos.isEmpty()) {
                         int contador = 1;
-                        for (Object[] cliente : topClientesPlatos) {
+                        for (Cliente cliente : topClientesPlatos) {
                             System.out.printf("%d %s %s (ID: %d) %s\n",
                                                 contador,
-                                                cliente[1], // su nombre
-                                                cliente[2], // apellido
-                                                cliente[0], // id
-                                                cliente[3]); //plato fav
+                                                cliente.getNombres(), // su nombre
+                                                cliente.getApellidos(), // apellido
+                                                cliente.getUsuario_id(), // id
+                                                cliente.getPlatosFavoritos()); //plato fav
                             contador++;                        
                         }
                     } else {
-                        System.out.println("No hay clientes con reservas o con preferencia de platos.");
-                    }
+                        System.out.println("\nREPORTE NO DISPONIBLE. \nTodavía no se cuenta con información de reservas de clientes.");}
 
                     break;}
                 
                 case 4:{//Reporte mensual de insumos a punto de terminarse o caducar
                     System.out.println("\n├───────REPORTE MENSUAL DE INSUMOS A PUNTO DE TERMINARSE O CADUCAR──────┤");
-
+                    List<Object[]> reporte_insumos = gestionBD.reporte_insumos(simulator.getFechaFormateada(), simulator.getFechaProximaSemana());
+                    if(reporte_insumos.size()>0){
+                        for(Object[] insumo : reporte_insumos) {
+                            System.out.printf("Restaurante: %s - Insumo: %s - Cantidad restante: %d - Fecha de caducidad: %s\n",
+                                              insumo[0], // nombre del restaurante
+                                              insumo[1], // nombre del insumo
+                                              insumo[2], // cantidad restante
+                                              insumo[3]); // fecha de caducidad
+                        }}
+                    else {
+                        System.out.println("\nREPORTE NO DISPONIBLE. \nNo hay insumos a punto de terminarse o caducar en el inventario.");}
                     break;}
                 
                 case 5:{//Comportamiento de sucursales con mayor cantidad de reservas y ventas
                     System.out.println("\n├──COMPORTAMIENTO DE SUCURSALES CON MAYOR CANTIDAD DE RESERVAS Y VENTAS─┤");
-
+                    List<Object[]> comportamiento_sucursales = gestionBD.comportamiento_sucursales();
+                    if(comportamiento_sucursales.size()>0){
+                        for(Object[] sucursal : comportamiento_sucursales) {
+                            System.out.printf("Sucursal: %s - Reservas: %d - Ventas: Q%.2f\n",
+                                              sucursal[0], // nombre de la sucursal
+                                              sucursal[1], // cantidad de reservas
+                                              sucursal[2]); // cantidad de ventas
+                        }}
+                    else {
+                        System.out.println("\nREPORTE NO DISPONIBLE. \nNo hay información de reservas y ventas en las sucursales.");}
                     break;}
                 
                 case 6:{//Regresar al menú principal

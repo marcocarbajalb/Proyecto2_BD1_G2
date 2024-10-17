@@ -53,6 +53,11 @@ public class TimeSimulator {
         return getTiempoSimuladoActual().format(SQL_FORMATTER);
     }
 
+    public String getFechaProximaSemana() {
+        LocalDateTime fechaProximaSemana = getTiempoSimuladoActual().plusDays(7);
+        return fechaProximaSemana.format(SQL_FORMATTER);
+    }
+
     public boolean fechaPasada(String fecha) {
         LocalDateTime fechaComparar = LocalDateTime.parse(fecha, FORMATTER);
         return getTiempoSimuladoActual().isAfter(fechaComparar);
