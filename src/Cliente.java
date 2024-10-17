@@ -98,7 +98,7 @@ public class Cliente extends ITipoUsuario {
         boolean menu_secundario = true;
 		    while(menu_secundario) {
 		        System.out.println("\n░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░");
-                System.out.println("\n\t       ╔══════════════════════════════════════════╗\n\t       ║ Fecha y hora actual: " + simulator.getFechaFormateada() + " ║\n\t       ╚══════════════════════════════════════════╝");
+                System.out.println("\n\t       ╔══════════════════════════════════════════╗\n\t       ║ Fecha y hora actual: " + simulator.getFechaFormateada(false, 0) + " ║\n\t       ╚══════════════════════════════════════════╝");
                 
                 System.out.println("\n[CLIENTE]\nBienvenido/a, "+ usuario_activo.getNombres() + " " + usuario_activo.getApellidos());
 		        System.out.println("\nIngrese el número correspondiente a la opción que desea realizar:\n1. Reservar en restaurante\n2. Consultar mis reservas y pedidos\n3. Dejar observaciones/comentarios \n4. Consultar mi historial de visitas\n5. Cerrar sesión");
@@ -260,7 +260,7 @@ public class Cliente extends ITipoUsuario {
 
         //Verificar que la fecha y hora de la reserva no estén en el pasado
         if(simulator.fechaPasada(fecha_reserva + " " + hora_reserva)) {
-            System.out.println("\n**ERROR** \nLa fecha y hora de la reserva no pueden ser anteriores a la fecha y hora actual (" + simulator.getFechaFormateada() + ").");
+            System.out.println("\n**ERROR** \nLa fecha y hora de la reserva no pueden ser anteriores a la fecha y hora actual (" + simulator.getFechaFormateada(false, 0) + ").");
             return;}
         //Si hay mesas disponibles, hacer la reserva
         else if (gestionBD.verificarMesasDisponibles(restaurante_id, cantidad_mesas, fecha_reserva, hora_reserva)==false) {

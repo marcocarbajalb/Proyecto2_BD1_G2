@@ -8,7 +8,6 @@ import java.util.Scanner;
 import java.util.List;
 import java.util.Date;
 import java.util.ArrayList;
-import java.util.Collections;
 
 public class Administrador extends ITipoUsuario {
     
@@ -84,7 +83,7 @@ public class Administrador extends ITipoUsuario {
         boolean menu_secundario = true;
 		    while(menu_secundario) {
 		        System.out.println("\n░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░");
-                System.out.println("\n\t       ╔══════════════════════════════════════════╗\n\t       ║ Fecha y hora actual: " + simulator.getFechaFormateada() + " ║\n\t       ╚══════════════════════════════════════════╝");
+                System.out.println("\n\t       ╔══════════════════════════════════════════╗\n\t       ║ Fecha y hora actual: " + simulator.getFechaFormateada(true, 0) + " ║\n\t       ╚══════════════════════════════════════════╝");
                 
                 System.out.println("\n[ADMINISTRADOR]\nBienvenido/a, "+ usuario_activo.getNombres() + " " + usuario_activo.getApellidos());
 		        System.out.println("\nIngrese el número correspondiente a la opción que desea realizar:\n1. Desplegar auditoría de cambios\n2. Generar reportes\n3. Ver personal\n4. Gestionar inventario\n5. Ver disponibilidad de mesas\n6. Consultar reservas y pedidos\n7. Ver historial de clientes\n8. Cerrar sesión");
@@ -175,67 +174,79 @@ public class Administrador extends ITipoUsuario {
                         while(seleccion_restaurante) {
                             System.out.println("\nIngrese el número de la sucursal de la que desea gestionar el inventario: ");
                             for(int i = 0; i < restaurantes.length; i++) {
-                                System.out.println((i + 1) + ". " + restaurantes[i]);
-                            }
+                                System.out.println((i + 1) + ". " + restaurantes[i]);}
                     
                             try {
-                                decision_restaurante = scanInt.nextInt();
-                            } catch(Exception e) {
+                                decision_restaurante = scanInt.nextInt();} 
+                            catch(Exception e) {
                                 System.out.println("\n**ERROR** La decisión ingresada debe ser un número.");
                                 scanInt.nextLine();
-                                continue;
-                            }
+                                continue;}
                     
                             if((decision_restaurante >= 1) && (decision_restaurante <= restaurantes.length)) {
-                                seleccion_restaurante = false;
-                            } else {
-                                System.out.println("\n**ERROR** El número ingresado no se encuentra entre las opciones disponibles.");
-                            }
-                        }
+                                seleccion_restaurante = false;} 
+                            else {
+                                System.out.println("\n**ERROR** El número ingresado no se encuentra entre las opciones disponibles.");}}
                     
                         restaurante_id = decision_restaurante;
                         
                         boolean validar_menu_inventario = true;
                         while(validar_menu_inventario) {
-                        
-                            System.out.println("\n\t\t[Sucursal: " + restaurantes[restaurante_id - 1] + "]");
+                            System.out.println("\n╠═══════════════════════════════════════════════════════════════════════╣");
+                            System.out.println("\t\t      [Sucursal: " + restaurantes[restaurante_id - 1] + "]");
                         
                             // Opciones de gestión de inventario
-                            System.out.println("Ingrese el número correspondiente a la opción que desea realizar:\n1. Mostrar inventario\n2. Cambiar cantidad de insumos\n3. Observar inventario en orden de cantidad\n4. Observar inventario en orden de caducidad \n5. Regresar al menú principal");
-
+                            System.out.println("\nIngrese el número correspondiente a la opción que desea realizar:\n1. Ver inventario\n2. Modificar inventario\n3. Regresar al menú principal");
+                                
                             int opcion = 0;
                             try {opcion = scanInt.nextInt();}
-                            
                             catch(Exception e) {//En caso de que el usuario ingrese texto en lugar de un número 
                                 System.out.println("\n**ERROR** La decision ingresada debe ser un número.");
                                 scanInt.nextLine();
-                                continue;}
+                                    continue;}
                             
                             switch (opcion) {
-                                case 1:
+                                case 1:{
+                                    System.out.println("\n├─────────────────────────────VER INVENTARIO────────────────────────────┤");
                                     ver_inventario(restaurante_id, gestionBD);
-                                    break;
-                                case 2:
-                                    System.out.println("Ingrese el nombre del insumo:");
-                                    String nombreInsumo = scanString.nextLine().trim();
-                                    System.out.println("Ingrese la nueva cantidad:");
-                                    int nuevaCantidad = scanInt.nextInt();
-                                    cambiarCantidadInsumo(restaurante_id, nombreInsumo, nuevaCantidad, gestionBD);
-                                    break;
-                                case 3:
-                                    ordenarPorMayorCantidad();
-                                    ver_inventario(restaurante_id, gestionBD); // Mostrar el inventario reordenado
-                                    break;
-                                case 4:
-                                    ordenarPorFechaCaducidad();
-                                    ver_inventario(restaurante_id, gestionBD); // Mostrar el inventario reordenado
-                                    break;
-                                case 5:
+
+                                    // Opción de ordenar
+                                    boolean menu_inventario = true;
+                                    int opcion_secundaria = 0;
+                                    while (menu_inventario) {
+                                        System.out.println("\nIngrese el número correspondiente al filtro que desea aplicar:\n1. Ordenar por fecha de caducidad \n2. Ordenar por mayor cantidad \n3. Regresar");
+                                        try {opcion_secundaria = scanInt.nextInt();}
+                                        catch(Exception e) {//En caso de que el usuario ingrese texto en lugar de un número 
+                                            System.out.println("\n**ERROR** La decision ingresada debe ser un número.");
+                                            scanInt.nextLine();
+                                            continue;}
+
+                                        switch(opcion_secundaria) {
+                                            case 1:
+                                                System.out.println("\n├───────────────────────────────────────────────────────────────────────┤");
+                                                ver_inventario_ordenado(restaurante_id, gestionBD, "fecha");
+                                                break;
+                                            case 2:
+                                                System.out.println("\n├───────────────────────────────────────────────────────────────────────┤");
+                                                ver_inventario_ordenado(restaurante_id, gestionBD, "cantidad");
+                                                break;
+                                            case 3:
+                                                menu_inventario = false;
+                                                break;
+                                            default:
+                                                System.out.println("\n**ERROR** El número ingresado no se encuentra entre las opciones disponibles.");
+                                                break;}}
+                                    break;}
+                                case 2:{
+                                    System.out.println("\n├──────────────────────────MODIFICAR INVENTARIO─────────────────────────┤");
+                                    modificar_inventario(restaurante_id, gestionBD, scanString, scanInt, simulator);
+                                    break;}
+                                case 3:{
                                     validar_menu_inventario = false;
-                                    break;
-                                default:
-                                    System.out.println("\n**ERROR** El número ingresado no se encuentra entre las opciones disponibles.");
-                                    break;}}
+                                    break;}
+                                default:{
+                                    System.out.println("\n**ERROR**\nEl número ingresado no se encuentra entre las opciones disponibles.");
+                                    break;}}}
                         break;}
                     
                     case 5:{//Ver disponibilidad de mesas
@@ -415,7 +426,7 @@ public class Administrador extends ITipoUsuario {
                 
                 case 4:{//Reporte mensual de insumos a punto de terminarse o caducar
                     System.out.println("\n├───────REPORTE MENSUAL DE INSUMOS A PUNTO DE TERMINARSE O CADUCAR──────┤");
-                    List<Object[]> reporte_insumos = gestionBD.reporte_insumos(simulator.getFechaFormateada(), simulator.getFechaProximaSemana());
+                    List<Object[]> reporte_insumos = gestionBD.reporte_insumos(simulator.getFechaFormateada(false, 0), simulator.getFechaProximaSemana());
                     if(reporte_insumos.size()>0){
                         for(Object[] insumo : reporte_insumos) {
                             System.out.printf("Restaurante: %s - Insumo: %s - Cantidad restante: %d - Fecha de caducidad: %s\n",
@@ -489,7 +500,7 @@ public class Administrador extends ITipoUsuario {
 
     public static void mostrarDistribucionMesas(int restaurante_id, GestionBD gestionBD, TimeSimulator simulator) {
         String[] restaurantes = {"Campus Pizza UVG","Campus Pizza URL","Campus Pizza UFM","Campus Pizza UNIS", "Campus Pizza USAC"};
-        System.out.println("\nSucursal: " + restaurantes[restaurante_id-1] + "\nFecha y hora actual: " + simulator.getFechaFormateada() + "\n");
+        System.out.println("\nSucursal: " + restaurantes[restaurante_id-1] + "\nFecha y hora actual: " + simulator.getFechaFormateada(false, 0) + "\n");
         System.out.println("\t       Mesa disponible: O | Mesa ocupada: X\n");
         List<Integer> mesas_disponibles = gestionBD.listaMesasDisponibles(restaurante_id);
         Integer[] mesas = new Integer[30];
@@ -535,90 +546,142 @@ public class Administrador extends ITipoUsuario {
             System.out.println(lineaInferior);
         }
     }
-        // -------- GESTION DE INVENTARIOS ---------------- 
-        public void ver_inventario(int restaurante_id, GestionBD gestionBD) {
-            // Obtener el inventario del restaurante
-            nombresInsumos.clear();
-            cantidades.clear();
-            fechasCaducidad.clear();
-        
-            // Obtener los datos del inventario
-            List<List<Object>> inventario = gestionBD.obtenerInventarioPorRestaurante(restaurante_id);
-            
-            for (List<Object> item : inventario) {
-                nombresInsumos.add((String) item.get(0)); // Nombre del insumo
-                cantidades.add((Integer) item.get(1));    // Cantidad
-                fechasCaducidad.add((Date) item.get(2));  // Fecha de caducidad
-            }
-        
-            // Mostrar inventario
-            System.out.println();
-            System.out.printf("%-30s %-10s %-15s%n", "Nombre del insumo", "Cantidad", "Fecha de caducidad");
-            System.out.println("--------------------------------------------------------------");
-            for (int i = 0; i < nombresInsumos.size(); i++) {
-                System.out.printf("%-30s %-10d %-15s%n", nombresInsumos.get(i), cantidades.get(i), fechasCaducidad.get(i));
-            }
-        }
+    
+    // GESTIÓN DE INVENTARIOS
 
-        public void cambiarCantidadInsumo(int restauranteId, String nombreInsumo, int nuevaCantidad, GestionBD gestionBD) {
-            gestionBD.actualizarCantidadInsumo(restauranteId, nombreInsumo, nuevaCantidad);
-        }
-
-        //ordenar inventario por cantidad... 
-    public void ordenarPorMayorCantidad() {
-        // Crear una lista de índices para ordenar
-        List<Integer> indices = new ArrayList<>();
-        for (int i = 0; i < nombresInsumos.size(); i++) {
-            indices.add(i);
-        }
-    
-        // Ordenar los índices por cantidad
-        Collections.sort(indices, (i1, i2) -> Integer.compare(cantidades.get(i2), cantidades.get(i1)));
-    
-        // Reordenar las listas
-        List<String> nombresInsumosOrdenados = new ArrayList<>();
-        List<Integer> cantidadesOrdenadas = new ArrayList<>();
-    
-        for (int index : indices) {
-            nombresInsumosOrdenados.add(nombresInsumos.get(index));
-            cantidadesOrdenadas.add(cantidades.get(index));
-        }
-    
-        // Actualizar las listas originales
-        nombresInsumos.clear();
-        cantidades.clear();
-        nombresInsumos.addAll(nombresInsumosOrdenados);
-        cantidades.addAll(cantidadesOrdenadas);
-    }
-
-    // ordenar el inventario por fechas de caducidad...
-    public void ordenarPorFechaCaducidad() {
-        // Crear una lista de índices para ordenar
-        List<Integer> indices = new ArrayList<>();
-        for (int i = 0; i < nombresInsumos.size(); i++) {
-            indices.add(i);
-        }
-    
-        // Ordenar los índices por fecha de caducidad
-        Collections.sort(indices, (i1, i2) -> fechasCaducidad.get(i1).compareTo(fechasCaducidad.get(i2)));
-    
-        // Reordenar las listas
-        List<String> nombresInsumosOrdenados = new ArrayList<>();
-        List<Integer> cantidadesOrdenadas = new ArrayList<>();
-        List<Date> fechasCaducidadOrdenadas = new ArrayList<>();
-    
-        for (int index : indices) {
-            nombresInsumosOrdenados.add(nombresInsumos.get(index));
-            cantidadesOrdenadas.add(cantidades.get(index));
-            fechasCaducidadOrdenadas.add(fechasCaducidad.get(index));
-        }
-    
-        // Actualizar las listas originales
+    public void ver_inventario(int restaurante_id, GestionBD gestionBD) {
+        // Obtener el inventario del restaurante
         nombresInsumos.clear();
         cantidades.clear();
         fechasCaducidad.clear();
-        nombresInsumos.addAll(nombresInsumosOrdenados);
-        cantidades.addAll(cantidadesOrdenadas);
-        fechasCaducidad.addAll(fechasCaducidadOrdenadas);
+    
+        // Obtener los datos del inventario
+        List<List<Object>> inventario = gestionBD.obtenerInventarioPorRestaurante(restaurante_id);
+        
+        for (List<Object> item : inventario) {
+            nombresInsumos.add((String) item.get(0)); // Nombre del insumo
+            cantidades.add((Integer) item.get(1));    // Cantidad
+            fechasCaducidad.add((Date) item.get(2));  // Fecha de caducidad
+        }
+    
+        // Mostrar inventario
+        System.out.println();
+        System.out.printf("%-30s %-10s %-15s%n", "Nombre del insumo", "Cantidad", "Fecha de caducidad");
+        System.out.println("--------------------------------------------------------------");
+        for (int i = 0; i < nombresInsumos.size(); i++) {
+            System.out.printf("%-30s %-10d %-15s%n", nombresInsumos.get(i), cantidades.get(i), fechasCaducidad.get(i));
+        }
+    }
+
+    // Función para ver el inventario ordenado
+    public void ver_inventario_ordenado(int restaurante_id, GestionBD gestionBD, String filtro) {
+        // Obtener el inventario del restaurante
+        nombresInsumos.clear();
+        cantidades.clear();
+        fechasCaducidad.clear();
+    
+        // Obtener los datos del inventario
+        List<List<Object>> inventario = gestionBD.obtenerInventarioPorRestaurante(restaurante_id, filtro);
+        
+        for (List<Object> item : inventario) {
+            nombresInsumos.add((String) item.get(0)); // Nombre del insumo
+            cantidades.add((Integer) item.get(1));    // Cantidad
+            fechasCaducidad.add((Date) item.get(2));  // Fecha de caducidad
+        }
+    
+        // Mostrar inventario
+        System.out.println();
+        System.out.printf("%-30s %-10s %-15s%n", "Nombre del insumo", "Cantidad", "Fecha de caducidad");
+        System.out.println("--------------------------------------------------------------");
+        for (int i = 0; i < nombresInsumos.size(); i++) {
+            System.out.printf("%-30s %-10d %-15s%n", nombresInsumos.get(i), cantidades.get(i), fechasCaducidad.get(i));
+        }
+    }
+
+    public void modificar_inventario(int restaurante_id, GestionBD gestionBD, Scanner scanString, Scanner scanInt, TimeSimulator simulator) {
+        
+        //Atributos necesarios para modificar el inventario
+        Integer insumo_id = 0, nuevaCantidad = 0, dia=0, mes=0, year=0;
+        String fecha_caducidad = "";
+
+        String[] insumos = {"masa", "bote de salsa de tomate", "bolsa de queso mozzarella", "porción de jamón", "porción de piña", "porción de pepperoni", "porción de champiñones", "porción de cebolla", "porción de albahaca", "porción de tomate", "porción de espinaca", "botella de agua pura", "lata de coca-cola", "lata de coca-cola zero"};
+        int decision_insumo = 0;
+        boolean seleccion_insumo = true;
+        while(seleccion_insumo) {
+            System.out.println("\nIngrese el número correspondiente al insumo que desea modificar: ");
+            for(int i=0;i<insumos.length;i++) {
+                System.out.println((i+1) + ". " + insumos[i]);}
+            
+            try {
+                decision_insumo = scanInt.nextInt();} 
+            catch(Exception e) {
+                System.out.println("\n**ERROR** La decision ingresada debe ser un número.");
+                scanInt.nextLine();
+                continue;}
+            
+            if((decision_insumo>=1)&&(decision_insumo<=insumos.length)) {
+                seleccion_insumo = false;} 
+            else {
+                System.out.println("\n**ERROR** El número ingresado no se encuentra entre las opciones disponibles.");}}
+
+        insumo_id = decision_insumo;
+
+        boolean seleccion_cantidad = true;
+        while(seleccion_cantidad) {
+            System.out.println("\nIngrese la nueva cantidad del insumo: ");
+            try {
+                nuevaCantidad = scanInt.nextInt();} 
+            catch(Exception e) {
+                System.out.println("\n**ERROR** La cantidad ingresada debe ser un número.");
+                scanInt.nextLine();
+                continue;}
+            
+            if(nuevaCantidad>0 && nuevaCantidad<=100) {
+                seleccion_cantidad = false;} 
+            else {
+                System.out.println("\n**ERROR** La cantidad ingresada debe ser mayor a 0 y menor o igual a 100.");}}
+
+        boolean seleccion_fecha = true;
+        while(seleccion_fecha) {
+            System.out.println("\nIngrese la fecha de caducidad del insumo (utilice el formato 'DD/MM/AAAA'): ");
+            try {
+                fecha_caducidad = scanString.nextLine().trim();
+                String[] fecha_caducidad_separada = fecha_caducidad.split("/");
+                dia = Integer.parseInt(fecha_caducidad_separada[0]);
+                mes = Integer.parseInt(fecha_caducidad_separada[1]);
+                year = Integer.parseInt(fecha_caducidad_separada[2]);} 
+            catch(Exception e) {
+                System.out.println("\n**ERROR** Ingrese la fecha en el formato solicitado.");
+                scanString.nextLine();
+                continue;}
+
+            if((mes==2)&&(dia==29)&&(((year%4==0)&&(year%100!=0))||(year%400==0))) { //Único caso para años bisiestos
+                seleccion_fecha = false;}
+            else if((mes==2)&&(dia>28)) {
+                if(((year%4==0)&&(year%100!=0))||(year%400==0)){
+                    System.out.println("\n**ERROR** El mes de febrero tiene 29 días para el año ingresado.");
+                    continue;}
+                else{
+                    System.out.println("\n**ERROR** El mes de febrero solo tiene 28 días para el año ingresado.");
+                    continue;}}
+            else if((mes==4||mes==6||mes==9||mes==11)&&(dia>30)) {
+                System.out.println("\n**ERROR** El mes ingresado solo tiene 30 días.");
+                continue;}
+            else if((dia>0)&&(dia<=31)&&(mes>0)&&(mes<=12)&&(year>=2024)) {
+                String mes_formateado = String.format("%02d", mes);
+                String dia_formateado = String.format("%02d", dia);
+                String fecha_final = year + "-" + mes_formateado + "-" + dia_formateado;
+                String fecha_final_completa = year + "-" + mes_formateado + "-" + dia_formateado + " 23:59:59";
+                
+                if(simulator.fechaPasada(fecha_final_completa)) {
+                    System.out.println("\n**ERROR** \nLa fecha de caducidad no puede ser anterior o igual a la fecha actual (" + simulator.getFechaFormateada(false, 0) + ").");}
+                else {
+                    fecha_caducidad = fecha_final;
+                    seleccion_fecha = false;}} 
+            else {
+                System.out.println("\n**ERROR** La fecha ingresada no es válida.");}}
+
+        gestionBD.actualizar_insumo(restaurante_id, insumo_id, nuevaCantidad, fecha_caducidad);
+        System.out.println("\nINSUMO ACTUALIZADO. \nEl insumo ha sido actualizado exitosamente.");
     }
 }

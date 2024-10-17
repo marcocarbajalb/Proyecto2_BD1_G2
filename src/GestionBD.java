@@ -778,68 +778,126 @@ public List<List<Object>> obtenerInventarioPorRestaurante(int restaurante_id) {
     return inventario;
 }
 
-// consulta para las alertas del 15% de insumos... 
-public List<List<Object>> obtenerInsumosBajoPorcentaje(int porcentaje) {
-    String sql = "SELECT i.nombre, inv.cantidad " +
+/* metodos para poder obtener los datos de inventario. */
+public List<List<Object>> obtenerInventarioPorRestaurante(int restaurante_id, String filtro) {
+    String sql1 = "SELECT i.nombre, inv.cantidad, inv.fecha_caducidad " +
                  "FROM inventario inv " +
                  "JOIN insumos i ON inv.insumo_id = i.insumo_id " +
-                 "WHERE inv.cantidad < (? / 100.0) * 100";
+                 "WHERE inv.restaurante_id = ? ORDER BY inv.cantidad DESC";
+
+    String sql2 = "SELECT i.nombre, inv.cantidad, inv.fecha_caducidad " +
+                "FROM inventario inv " +
+                "JOIN insumos i ON inv.insumo_id = i.insumo_id " +
+                "WHERE inv.restaurante_id = ? ORDER BY inv.fecha_caducidad ASC";
+    
+    List<List<Object>> inventario = new ArrayList<>();
+    
+    if(filtro.equals("cantidad")){
+        try (PreparedStatement statement = conexion.prepareStatement(sql1)) {
+            statement.setInt(1, restaurante_id);
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                List<Object> item = new ArrayList<>();
+                item.add(rs.getString("nombre"));
+                item.add(rs.getInt("cantidad"));
+                item.add(rs.getDate("fecha_caducidad"));
+                inventario.add(item);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al obtener el inventario: " + e.getMessage());
+        }
+    }
+    else if (filtro.equals("fecha")){
+        try (PreparedStatement statement = conexion.prepareStatement(sql2)) {
+            statement.setInt(1, restaurante_id);
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                List<Object> item = new ArrayList<>();
+                item.add(rs.getString("nombre"));
+                item.add(rs.getInt("cantidad"));
+                item.add(rs.getDate("fecha_caducidad"));
+                inventario.add(item);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al obtener el inventario: " + e.getMessage());
+        }
+    }
+    return inventario;
+}
+
+// consulta para las alertas del 15% de insumos... 
+public List<List<Object>> obtenerInsumosBajoPorcentaje(int porcentaje, int restaurante_id) {
+    String sql1 = "SELECT i.nombre, inv.cantidad, r.nombre_restaurante " +
+              "FROM inventario inv " +
+              "JOIN insumos i ON inv.insumo_id = i.insumo_id " +
+              "JOIN restaurante r ON inv.restaurante_id = r.restaurante_id " +
+              "WHERE inv.restaurante_id = ? AND inv.cantidad < (? / 100.0) * 100";
+
+    String sql2 = "SELECT i.nombre, inv.cantidad, r.nombre_restaurante " +
+                "FROM inventario inv " +
+                "JOIN insumos i ON inv.insumo_id = i.insumo_id " +
+                "JOIN restaurante r ON inv.restaurante_id = r.restaurante_id " +
+                "WHERE inv.cantidad < (? / 100.0) * 100";
+
     
     List<List<Object>> insumosBajos = new ArrayList<>();
     
-    try (PreparedStatement statement = conexion.prepareStatement(sql)) {
-        statement.setInt(1, porcentaje);
-        ResultSet rs = statement.executeQuery();
-        
-        while (rs.next()) {
-            List<Object> insumo = new ArrayList<>();
-            insumo.add(rs.getString("nombre")); // Nombre del insumo
-            insumo.add(rs.getInt("cantidad"));  // Cantidad restante
-            insumosBajos.add(insumo);
+    if(restaurante_id == 0){
+        try (PreparedStatement statement = conexion.prepareStatement(sql2)) {
+            statement.setInt(1, porcentaje);
+            ResultSet rs = statement.executeQuery();
+            
+            while (rs.next()) {
+                List<Object> insumo = new ArrayList<>();
+                insumo.add(rs.getString("nombre")); // Nombre del insumo
+                insumo.add(rs.getInt("cantidad"));  // Cantidad restante
+                insumo.add(rs.getString("nombre_restaurante")); // Nombre del restaurante
+                insumosBajos.add(insumo);
+            }
+            
+        } catch (SQLException e) {
+            System.out.println("Error al obtener insumos bajos: " + e.getMessage());
         }
-        
-    } catch (SQLException e) {
-        System.out.println("Error al obtener insumos bajos: " + e.getMessage());
+    }
+    else {
+        try (PreparedStatement statement = conexion.prepareStatement(sql1)) {
+            statement.setInt(1, restaurante_id);
+            statement.setInt(2, porcentaje);
+            ResultSet rs = statement.executeQuery();
+            
+            while (rs.next()) {
+                List<Object> insumo = new ArrayList<>();
+                insumo.add(rs.getString("nombre")); // Nombre del insumo
+                insumo.add(rs.getInt("cantidad"));  // Cantidad restante
+                insumo.add(rs.getString("nombre_restaurante")); // Nombre del restaurante
+                insumosBajos.add(insumo);
+            }
+            
+        } catch (SQLException e) {
+            System.out.println("Error al obtener insumos bajos: " + e.getMessage());
+        }
     }
     
     return insumosBajos;
 }
 
-public void actualizarCantidadInsumo(int restauranteId, String nombreInsumo, int nuevaCantidad) {
-    String insumoIdQuery = "SELECT insumo_id FROM insumos WHERE nombre = ?";
-    String actualizarCantidadQuery = "UPDATE inventario " +
-                                      "SET cantidad = ? " +
-                                      "WHERE restaurante_id = ? " +
-                                      "AND insumo_id = ?";
+public void actualizar_insumo(int restaurante_id, int insumo_id, int nuevaCantidad, String fechaCaducidad) {
+    String sql = "UPDATE inventario " +
+                 "SET cantidad = ?, fecha_caducidad = ? " +
+                 "WHERE restaurante_id = ? AND insumo_id = ?";
 
-    try (PreparedStatement insumoStatement = conexion.prepareStatement(insumoIdQuery)) {
-        // Obtener insumo_id
-        insumoStatement.setString(1, nombreInsumo);
-        ResultSet resultSet = insumoStatement.executeQuery();
-
-        if (resultSet.next()) {
-            long insumoId = resultSet.getLong("insumo_id");
-
-            try (PreparedStatement updateStatement = conexion.prepareStatement(actualizarCantidadQuery)) {
-                // Asignar parámetros
-                updateStatement.setInt(1, nuevaCantidad);
-                updateStatement.setInt(2, restauranteId);
-                updateStatement.setLong(3, insumoId);
-
-                // Ejecutar la actualización
-                int filasActualizadas = updateStatement.executeUpdate();
-
-                if (filasActualizadas > 0) {
-                    System.out.println("Cantidad de insumo actualizada correctamente.");
-                } else {
-                    System.out.println("No se encontró el insumo en el inventario para el restaurante.");
-                }
-            }
-        } else {
-            System.out.println("No se encontró el insumo con ese nombre.");
-        }
+    try (PreparedStatement statement = conexion.prepareStatement(sql)) {
+        
+        LocalDate localDate = LocalDate.parse(fechaCaducidad);
+        java.sql.Date sqlDate = java.sql.Date.valueOf(localDate);
+        
+        statement.setInt(1, nuevaCantidad);
+        statement.setDate(2, sqlDate);
+        statement.setInt(3, restaurante_id);
+        statement.setInt(4, insumo_id);
+        statement.executeUpdate();
     } catch (SQLException e) {
-        System.out.println("Error al actualizar la cantidad de insumo: " + e.getMessage());
+        System.out.println("Error al actualizar el insumo: " + e.getMessage());
     }
 }
 

@@ -16,7 +16,7 @@ public class SistemaCampusPizzaUI {
         Scanner scanInt = new Scanner(System.in);
         Scanner scanString = new Scanner(System.in);
 
-        System.out.println("\nConectando con la base de datos...\n\nIngrese su contraseña de PostgreSQL:");
+        System.out.println("\nConectando con la base de datos... \n\nIngrese su contraseña de PostgreSQL:");
         String password_postgresql = scanString.nextLine();
 
         //Conectar con la base de datos
@@ -37,7 +37,7 @@ public class SistemaCampusPizzaUI {
                 
                 //Menú que se le mostrará al usuario
                 System.out.println("\n\n░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░\n░░░░░░░░░░░░░░░░ BIENVENIDO/A AL SISTEMA DE CAMPUS PIZZA ░░░░░░░░░░░░░░░░\n░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░");
-                System.out.println("\n\t       ╔══════════════════════════════════════════╗\n\t       ║ Fecha y hora actual: " + simulator.getFechaFormateada() + " ║\n\t       ╚══════════════════════════════════════════╝");
+                System.out.println("\n\t       ╔══════════════════════════════════════════╗\n\t       ║ Fecha y hora actual: " + simulator.getFechaFormateada(false, 0) + " ║\n\t       ╚══════════════════════════════════════════╝");
                 System.out.println("\nIngrese el número correspondiente a la opción que desea realizar:\n1. Registrarse\n2. Iniciar sesión\n3. Salir del programa");
                 
                 int decision_principal = 0;
