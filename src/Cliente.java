@@ -312,10 +312,23 @@ public class Cliente extends ITipoUsuario {
                         scanInt.nextLine();
                         continue;}
                     
-                    if(cantidad_pedido>0) {
-                        for(int i=0;i<cantidad_pedido;i++) {
-                            platos_pedido.add(decision_pedido-1);
-                            gestionBD.agregarPlatoPedido(reserva_id, decision_pedido);
+                        if (cantidad_pedido > 0) {
+                            int unidades_agregadas = 0;
+                            for (int i = 0; i < cantidad_pedido; i++) {
+                                try {
+                                    if (gestionBD.verificarIngredientesDisponibles(decision_pedido, reserva_id)) {
+                                        platos_pedido.add(decision_pedido - 1);
+                                        gestionBD.agregarPlatoPedido(reserva_id, decision_pedido);
+                                        unidades_agregadas++;
+                                    } else {
+                                        System.out.println("\n**ERROR** No se cuenta con los ingredientes necesarios para preparar más unidades del plato seleccionado.");
+                                        System.out.println("Se han podido agregar " + unidades_agregadas + " unidad(es) del plato al pedido.");
+                                        break;
+                                    }
+                                } catch (Exception e) {
+                                    System.out.println("\n**ERROR** Ocurrió un problema al agregar el plato al pedido: " + e.getMessage());
+                                    break;
+                                }
                             }}
                     else {
                         System.out.println("\n**ERROR** La cantidad ingresada debe ser mayor a 0.");}}}

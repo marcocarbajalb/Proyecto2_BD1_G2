@@ -8,7 +8,7 @@ import java.util.List;
 public class TimeSimulator {
     private LocalDateTime simulatedTime;
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    private double timeSpeed = 3600; // El tiempo pasa 120 veces más rápido (cada minuto en la vida real son dos horas en el simulador)
+    private double timeSpeed = 120; // El tiempo pasa 120 veces más rápido (cada minuto en la vida real son dos horas en el simulador)
     private boolean isRunning = false;
     private long lastUpdate;
     private GestionBD gestionBD;

@@ -17,6 +17,8 @@ import java.sql.Time;
 import java.sql.Array;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.HashMap;
+import java.util.Map;
 
 public class GestionBD {
     private Connection conexion;
@@ -1101,5 +1103,71 @@ public void actualizar_insumo(int restaurante_id, int insumo_id, int nuevaCantid
         }
 
         return reporte;}
+
+    public boolean verificarIngredientesDisponibles(int plato_id, int reserva_id) {
+
+        String sql = "SELECT restaurante_id " +
+                    "FROM reserva " +
+                    "WHERE reserva_id = ?";
+        
+        int restaurante_id = 0;
+        try (PreparedStatement statement = conexion.prepareStatement(sql)) {
+            statement.setInt(1, reserva_id);
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) {
+                restaurante_id = rs.getInt("restaurante_id");
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al obtener el restaurante de la reserva: " + e.getMessage());
+        }
+
+        Map<Integer, List<Integer>> platosInsumos = new HashMap<>();
+
+        // Agregar las relaciones de cada plato con sus insumos
+        platosInsumos.put(1, Arrays.asList(1, 2, 3, 4, 5)); // Pizza hawaiana
+        platosInsumos.put(2, Arrays.asList(1, 2, 3, 6));    // Pizza de pepperoni
+        platosInsumos.put(3, Arrays.asList(1, 2, 3));       // Pizza de queso
+        platosInsumos.put(4, Arrays.asList(1, 2, 3, 7, 8, 9)); // Pizza de vegetales
+        platosInsumos.put(5, Arrays.asList(1, 2, 3, 10, 11));   // Pizza margarita
+        platosInsumos.put(6, Arrays.asList(1, 2, 3, 4));    // Pizza de jamón
+        platosInsumos.put(7, Arrays.asList(12));            // Agua pura
+        platosInsumos.put(8, Arrays.asList(13));            // Coca-cola
+        platosInsumos.put(9, Arrays.asList(14));            // Coca-cola zero
+
+        List<Integer> insumosNecesarios = platosInsumos.get(plato_id);
+        for (int insumo_id : insumosNecesarios) {
+            if (!existeInsumoRestaurante(insumo_id, restaurante_id, 1)) {
+                return false;
+            }
+        }
+        return true;}
+
+        public boolean existeInsumoRestaurante(int insumo_id, int restaurante_id, int cantidadNecesaria) {
+            String sql = "SELECT cantidad " +
+                         "FROM inventario " +
+                         "WHERE insumo_id = ? AND restaurante_id = ?";
+            int cantidad = 0;
+        
+            try (PreparedStatement statement = conexion.prepareStatement(sql)) {
+                statement.setInt(1, insumo_id);
+                statement.setInt(2, restaurante_id);
+        
+                ResultSet rs = statement.executeQuery();
+        
+                if (rs.next()) {
+                    cantidad = rs.getInt("cantidad");
+                } else {
+                    System.out.println("El insumo con ID " + insumo_id + " no se encuentra en el inventario del restaurante " + restaurante_id);
+                    return false;
+                }
+        
+            } catch (SQLException e) {
+                System.out.println("Error al verificar la existencia del insumo en el restaurante: " + e.getMessage());
+                return false; // Retorna false en caso de error en la consulta
+            }
+        
+            // Verificar que haya al menos la cantidad necesaria
+            return cantidad >= cantidadNecesaria;
+        }        
     
 }
