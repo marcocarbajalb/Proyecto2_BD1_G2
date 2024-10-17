@@ -78,6 +78,13 @@ public class TimeSimulator {
         if (mostrar_alerta) {
             // Llamar a la función en GestionBD para obtener los insumos por debajo del 15%
             List<List<Object>> insumosBajos = gestionBD.obtenerInsumosBajoPorcentaje(15, restaurante_id);
+
+            LocalDateTime tiempoActual = simulatedTime;
+            String fecha = tiempoActual.toLocalDate().toString();
+            LocalDateTime tiempoProximaSemana = tiempoActual.plusDays(7);
+            String fechaProximaSemana = tiempoProximaSemana.toLocalDate().toString();
+
+            List<List<Object>> insumosPorCaducar = gestionBD.obtenerInsumosProximosACaducar(fecha, fechaProximaSemana, restaurante_id);
             
             if (insumosBajos.isEmpty()) {
                 System.out.println("\n\t    [No hay insumos con menos del 15% de su capacidad]");
@@ -90,6 +97,18 @@ public class TimeSimulator {
                     int cantidad = (int) insumo.get(1);
                     String nombreRestaurante = (String) insumo.get(2);
                     System.out.printf("%-30s %-20s %-25s%n", nombreInsumo, cantidad, nombreRestaurante);
-                }}}
-    }
+                }}
+            
+            if (insumosPorCaducar.isEmpty()) {
+                System.out.println("\n\t    [No hay insumos a una semana o menos de caducar]");
+            } else {
+                System.out.println("\n╠══════════════════════¡ALERTA: INSUMOS POR CADUCAR!════════════════════╣\n");
+                System.out.printf("%-30s %-20s %-25s%n", "Nombre del insumo", "Fecha caducidad", "Sucursal");
+                System.out.println("-------------------------------------------------------------------------");
+                for (List<Object> insumo : insumosPorCaducar) {
+                    String nombreInsumo = (String) insumo.get(0);
+                    String fechaCaducidad = insumo.get(3).toString();
+                    String nombreRestaurante = (String) insumo.get(2);
+                    System.out.printf("%-30s %-20s %-25s%n", nombreInsumo, fechaCaducidad, nombreRestaurante);
+                }}}}
 }

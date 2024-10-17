@@ -839,7 +839,6 @@ public List<List<Object>> obtenerInsumosBajoPorcentaje(int porcentaje, int resta
                 "JOIN restaurante r ON inv.restaurante_id = r.restaurante_id " +
                 "WHERE inv.cantidad < (? / 100.0) * 100";
 
-    
     List<List<Object>> insumosBajos = new ArrayList<>();
     
     if(restaurante_id == 0){
@@ -879,6 +878,79 @@ public List<List<Object>> obtenerInsumosBajoPorcentaje(int porcentaje, int resta
     }
     
     return insumosBajos;
+}
+
+public List<List<Object>> obtenerInsumosProximosACaducar(String fechaInicio, String fechaFin, int restaurante_id) {
+    String sql1 = "SELECT i.nombre, inv.cantidad, r.nombre_restaurante, inv.fecha_caducidad " +
+                  "FROM inventario inv " +
+                  "JOIN insumos i ON inv.insumo_id = i.insumo_id " +
+                  "JOIN restaurante r ON inv.restaurante_id = r.restaurante_id " +
+                  "WHERE inv.restaurante_id = ? AND inv.fecha_caducidad BETWEEN ? AND ?";
+
+    String sql2 = "SELECT i.nombre, inv.cantidad, r.nombre_restaurante, inv.fecha_caducidad " +
+                  "FROM inventario inv " +
+                  "JOIN insumos i ON inv.insumo_id = i.insumo_id " +
+                  "JOIN restaurante r ON inv.restaurante_id = r.restaurante_id " +
+                  "WHERE inv.fecha_caducidad BETWEEN ? AND ?";
+
+    List<List<Object>> insumosProximosACaducar = new ArrayList<>();
+    
+    if (restaurante_id == 0) {
+        try (PreparedStatement statement = conexion.prepareStatement(sql2)) {
+            // Convertir las fechas a LocalDate y luego a SQL Date
+            LocalDate localDateInicio = LocalDate.parse(fechaInicio);
+            Date sqlDateInicio = Date.valueOf(localDateInicio);
+
+            LocalDate localDateFin = LocalDate.parse(fechaFin);
+            Date sqlDateFin = Date.valueOf(localDateFin);
+            
+            statement.setDate(1, sqlDateInicio);
+            statement.setDate(2, sqlDateFin);
+
+            ResultSet rs = statement.executeQuery();
+            
+            while (rs.next()) {
+                List<Object> insumo = new ArrayList<>();
+                insumo.add(rs.getString("nombre")); // Nombre del insumo
+                insumo.add(rs.getInt("cantidad"));  // Cantidad restante
+                insumo.add(rs.getString("nombre_restaurante")); // Nombre del restaurante
+                insumo.add(rs.getDate("fecha_caducidad")); // Fecha de caducidad
+                insumosProximosACaducar.add(insumo);
+            }
+            
+        } catch (SQLException e) {
+            System.out.println("Error al obtener insumos próximos a caducar: " + e.getMessage());
+        }
+    } else {
+        try (PreparedStatement statement = conexion.prepareStatement(sql1)) {
+            // Convertir las fechas a LocalDate y luego a SQL Date
+            LocalDate localDateInicio = LocalDate.parse(fechaInicio);
+            Date sqlDateInicio = Date.valueOf(localDateInicio);
+
+            LocalDate localDateFin = LocalDate.parse(fechaFin);
+            Date sqlDateFin = Date.valueOf(localDateFin);
+            
+            statement.setInt(1, restaurante_id);
+            statement.setDate(2, sqlDateInicio);
+            statement.setDate(3, sqlDateFin);
+
+            ResultSet rs = statement.executeQuery();
+            
+            while (rs.next()) {
+                List<Object> insumo = new ArrayList<>();
+                insumo.add(rs.getString("nombre")); // Nombre del insumo
+                insumo.add(rs.getInt("cantidad"));  // Cantidad restante
+                insumo.add(rs.getString("nombre_restaurante")); // Nombre del restaurante
+                insumo.add(rs.getDate("fecha_caducidad")); // Fecha de caducidad
+                insumosProximosACaducar.add(insumo);
+            }
+            
+        } catch (SQLException e) {
+            System.out.println("Error al obtener insumos próximos a caducar: " + e.getMessage());
+        }
+    }
+    
+    return insumosProximosACaducar;
 }
 
 public void actualizar_insumo(int restaurante_id, int insumo_id, int nuevaCantidad, String fechaCaducidad) {
